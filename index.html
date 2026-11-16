@@ -22,9 +22,16 @@ button{border:0;border-radius:14px;padding:13px 16px;background:var(--purple);co
 .row{padding:12px 2px;border-bottom:1px solid #eee9f8;line-height:1.55}.row:last-child{border:0}.small{font-size:12px;color:var(--muted)}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
 @media(min-width:560px){.grid.characters{grid-template-columns:repeat(4,1fr)}}@media(max-width:380px){main{padding:9px}.card{padding:14px}.two{grid-template-columns:1fr}}
+
+#installAppBar{position:sticky;top:0;z-index:20;margin:10px auto 0;width:min(730px,calc(100% - 20px));padding:10px 12px;border-radius:16px;background:linear-gradient(100deg,#5b3cc4,#a45de0);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 5px 18px #5232a533;font-weight:700}#installAppBar button{width:auto;white-space:nowrap;margin:0;background:#fff;color:#5736b4;padding:9px 13px;font-size:14px}#installAppBar small{display:block;font-weight:500;opacity:.9}@media(max-width:420px){#installAppBar{font-size:13px}#installAppBar button{font-size:12px;padding:8px}}
 </style>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
 </head>
 <body>
+<div id="installAppBar"><div>📲 MateKKaland telepítése<small>Legyen saját ikonja a telefonodon!</small></div><button id="installAppBtn" type="button">Telepítés</button></div>
+
 <header><h1>🌈 MateKKaland</h1><p>Tanulj, játssz, fejlődj – minden csillag számít!</p></header>
 <main>
 <section id="home">
@@ -113,4 +120,12 @@ document.getElementById("answer").addEventListener("keydown",e=>{if(e.key==="Ent
 document.getElementById("player").addEventListener("input",e=>{document.getElementById("welcome").textContent=e.target.value.trim()?"Szia, "+e.target.value.trim()+"!":"Szia, kis matematikus!"});
 init();renderProfiles();
 </script>
+// MateKKaland Android PWA és offline támogatás
+let matekInstallPrompt=null;
+const matekInstallBtn=document.getElementById("installAppBtn");
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();matekInstallPrompt=e;matekInstallBtn.textContent="Telepítés";});
+window.addEventListener("appinstalled",()=>{matekInstallPrompt=null;document.getElementById("installAppBar").innerHTML="<div>🎉 MateKKaland telepítve!<small>Most már a telefonodról is elindíthatod.</small></div>";});
+matekInstallBtn.addEventListener("click",async()=>{if(matekInstallPrompt){matekInstallPrompt.prompt();await matekInstallPrompt.userChoice;matekInstallPrompt=null;}else{alert("A telepítéshez nyisd meg a böngésző jobb felső menüjét (⋮), majd válaszd az „Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz” lehetőséget. Ha nem jelenik meg, előbb töltsd be az oldalt internetkapcsolattal, majd próbáld újra.");}});
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(err=>console.log("Offline mód nem aktiválódott:",err)));}
+
 </body></html>
