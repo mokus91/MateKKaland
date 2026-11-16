@@ -31,7 +31,7 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
  <div class="card hero">
   <div class="mascot" id="homeMascot">🦊</div><h2 id="welcome">Szia, kis matematikus!</h2>
   <p class="sub">Válaszd ki a kalandod, gyűjts csillagokat, és lépj egyre magasabb szintre!</p>
-  <label for="player">A játékos neve</label><input id="player" maxlength="24" placeholder="Hogy hívnak?">
+  <label for="profileSelect">Gyermekprofil</label><select id="profileSelect" onchange="switchProfile(this.value)"></select><div class="two"><button class="secondary" onclick="addProfile()">➕ Új gyermek</button><button class="secondary" onclick="renameProfile()">✏️ Név módosítása</button></div><label for="player">A játékos neve</label><input id="player" maxlength="24" placeholder="Hogy hívnak?">
   <label for="grade">Melyik osztályba jársz?</label><select id="grade"><option value="1">1. osztály</option><option value="2">2. osztály</option><option value="3">3. osztály</option><option value="4">4. osztály</option><option value="5">5. osztály</option><option value="6">6. osztály</option></select>
   <label>Válassz társat!</label><div class="grid characters" id="characters"></div>
   <label for="topic">Milyen feladatot szeretnél?</label><select id="topic"><option value="mixed">🎲 Vegyes gyakorlás</option><option value="plusminus">➕ Összeadás és kivonás</option><option value="multiply">✖️ Szorzás és osztás</option><option value="challenge">🏆 Napi kihívás</option><option value="mistakes">💡 Korábbi hibáim gyakorlása</option></select>
@@ -59,10 +59,17 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
 </main><footer>MateKKaland • A tudás kaland, minden nap! 🌟</footer>
 <script>
 const characters=[{id:"fox",name:"Róka Robi",emoji:"🦊"},{id:"owl",name:"Bagoly Bori",emoji:"🦉"},{id:"cat",name:"Cica Cili",emoji:"🐱"},{id:"dino",name:"Dínó Dani",emoji:"🦖"}];
-const KEY="matekkaland_complete_v2",OLD="matekkaland_history",PIN_KEY="matekkaland_parent_pin";
-let data=loadData(),player="Játékos",grade=1,character=characters[0],topic="mixed",points=0,streak=0,done=0,correctCount=0,current=null,answered=false,sessionMistakes=[],sessionLog=[],questionSet=[],setIndex=0;
-function loadData(){try{return JSON.parse(localStorage.getItem(KEY))||{stars:0,done:0,correct:0,sessions:[],mistakes:[],badges:[]}}catch(e){return{stars:0,done:0,correct:0,sessions:[],mistakes:[],badges:[]}}}
-function saveData(){localStorage.setItem(KEY,JSON.stringify(data))}
+const KEY="matekkaland_complete_v2",OLD="matekkaland_history",PIN_KEY="matekkaland_parent_pin",PROFILE_KEY="matekkaland_profiles_v1";
+let profiles=[],activeProfileId="";let data=loadData(),player="Játékos",grade=1,character=characters[0],topic="mixed",points=0,streak=0,done=0,correctCount=0,current=null,answered=false,sessionMistakes=[],sessionLog=[],questionSet=[],setIndex=0;
+function emptyData(){return{stars:0,done:0,correct:0,sessions:[],mistakes:[],badges:[]}}
+function loadData(){try{profiles=JSON.parse(localStorage.getItem(PROFILE_KEY)||"[]");if(!profiles.length){let old=JSON.parse(localStorage.getItem(KEY)||"null")||emptyData();profiles=[{id:"child1",name:"Játékos 1",grade:1,character:"fox",data:old}]}activeProfileId=localStorage.getItem("matekkaland_active_profile")||profiles[0].id;let p=profiles.find(x=>x.id===activeProfileId)||profiles[0];activeProfileId=p.id;return p.data||emptyData()}catch(e){profiles=[{id:"child1",name:"Játékos 1",grade:1,character:"fox",data:emptyData()}];activeProfileId="child1";return profiles[0].data}}
+function saveProfiles(){localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles));localStorage.setItem("matekkaland_active_profile",activeProfileId)}
+function saveData(){let p=profiles.find(x=>x.id===activeProfileId);if(p){p.data=data;p.grade=grade;p.character=character.id;saveProfiles()}localStorage.setItem(KEY,JSON.stringify(data))}
+function currentProfile(){return profiles.find(x=>x.id===activeProfileId)||profiles[0]}
+function renderProfiles(){let sel=document.getElementById("profileSelect");if(!sel)return;sel.innerHTML=profiles.map(p=>'<option value="'+escapeHTML(p.id)+'">'+escapeHTML(p.name)+'</option>').join("");sel.value=activeProfileId;let p=currentProfile();if(p){document.getElementById("player").value=p.name;document.getElementById("grade").value=String(p.grade||1);selectCharacter(p.character||"fox");document.getElementById("welcome").textContent="Szia, "+p.name+"!"}}
+function switchProfile(id){saveData();let p=profiles.find(x=>x.id===id);if(!p)return;activeProfileId=id;data=p.data||emptyData();grade=p.grade||1;character=characters.find(c=>c.id===p.character)||characters[0];saveProfiles();renderProfiles();refreshHome()}
+function addProfile(){if(profiles.length>=6){alert("Legfeljebb 6 gyermekprofil hozható létre.");return}let name=prompt("Mi legyen a gyermek neve?");if(!name||!name.trim())return;let p={id:"child"+Date.now(),name:name.trim().slice(0,24),grade:1,character:"fox",data:emptyData()};profiles.push(p);activeProfileId=p.id;data=p.data;grade=1;character=characters[0];saveProfiles();renderProfiles();refreshHome()}
+function renameProfile(){let p=currentProfile();if(!p)return;let name=prompt("Új név:",p.name);if(!name||!name.trim())return;p.name=name.trim().slice(0,24);saveProfiles();renderProfiles()}
 function show(id){["home","game","parent","summary"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById(id).classList.remove("hidden");window.scrollTo(0,0)}
 function init(){document.getElementById("characters").innerHTML=characters.map((c,i)=>'<div class="character '+(!i?'selected':'')+'" data-id="'+c.id+'" onclick="selectCharacter(\''+c.id+'\')"><span>'+c.emoji+'</span><b>'+c.name+'</b></div>').join("");refreshHome()}
 function selectCharacter(id){character=characters.find(c=>c.id===id)||characters[0];document.querySelectorAll(".character").forEach(el=>el.classList.toggle("selected",el.dataset.id===id));document.getElementById("homeMascot").textContent=character.emoji}
@@ -84,7 +91,7 @@ if(op==="÷"){a=a*b;ans=b===0?0:a/b}
 return{text:a+" "+op+" "+b+" = ?",answer:ans,grade,op,a,b};
 }
 function buildQuestionSet(){questionSet=[];setIndex=0;let count=10;for(let i=0;i<count;i++){let q=makeQuestion();if(topic==="challenge"){q=makeQuestion();}questionSet.push(q)}}
-function startGame(){player=document.getElementById("player").value.trim()||"Játékos";grade=Number(document.getElementById("grade").value);topic=document.getElementById("topic").value;character=characters.find(c=>document.querySelector(".character.selected")?.dataset.id===c.id)||character;points=0;streak=0;done=0;correctCount=0;sessionMistakes=[];sessionLog=[];
+function startGame(){player=document.getElementById("player").value.trim()||"Játékos";grade=Number(document.getElementById("grade").value);topic=document.getElementById("topic").value;let prof=currentProfile();if(prof){prof.name=player;prof.grade=grade;prof.character=character.id;saveProfiles()}character=characters.find(c=>document.querySelector(".character.selected")?.dataset.id===c.id)||character;points=0;streak=0;done=0;correctCount=0;sessionMistakes=[];sessionLog=[];
 if(topic==="mistakes"){let pool=data.mistakes;if(!pool.length){alert("Még nincs korábbi hibás feladat. Játssz egy kört, és itt gyakorolhatod majd őket!");return}questionSet=pool.slice(-10).map(m=>({text:m.question,answer:m.answer,grade:m.grade||grade,op:"ismétlés"}));}else buildQuestionSet();
 document.getElementById("gameMascot").textContent=character.emoji;document.getElementById("playerPill").textContent=player;document.getElementById("gradePill").textContent=grade+". osztály";document.getElementById("topicTitle").textContent=topic==="challenge"?"🏆 Napi kihívás":topic==="mistakes"?"💡 Hibák gyakorlása":"Matematikai kaland";show("game");renderQuestion()}
 function renderQuestion(){current=questionSet[setIndex];if(!current){finishGame();return}answered=false;document.getElementById("question").textContent=current.text;document.getElementById("answer").value="";document.getElementById("feedback").textContent="";document.getElementById("feedback").className="feedback";document.getElementById("points").textContent=points;document.getElementById("streak").textContent=streak;document.getElementById("count").textContent=(setIndex+1)+"/"+questionSet.length;document.getElementById("levelPill").textContent=Math.floor((data.stars+points)/50)+1+". szint";document.getElementById("bar").style.width=(setIndex/questionSet.length*100)+"%";document.getElementById("answer").focus()}
@@ -104,6 +111,6 @@ function clearData(){if(confirm("Biztosan törlöd az összes helyi eredményt, 
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 document.getElementById("answer").addEventListener("keydown",e=>{if(e.key==="Enter"){if(!answered)checkAnswer();else nextQuestion()}});
 document.getElementById("player").addEventListener("input",e=>{document.getElementById("welcome").textContent=e.target.value.trim()?"Szia, "+e.target.value.trim()+"!":"Szia, kis matematikus!"});
-init();
+init();renderProfiles();
 </script>
 </body></html>
