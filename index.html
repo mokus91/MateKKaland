@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6546d8">
+<title>Matekkaland</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2edff;color:#30254d}
+header{background:linear-gradient(135deg,#6546d8,#a36af0);color:white;text-align:center;padding:24px 12px;border-radius:0 0 28px 28px}
+header h1{margin:0;font-size:30px}
+header p{margin:8px 0 0}
+main{max-width:650px;margin:auto;padding:16px}
+.card{background:white;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 5px 18px #33205a12}
+.mascot{text-align:center;font-size:75px}
+h2{text-align:center;margin:8px 0 16px}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+select,input{width:100%;padding:14px;border:2px solid #ded5fa;border-radius:12px;font-size:17px}
+button{border:0;border-radius:14px;padding:14px 18px;background:#7651df;color:white;font-size:17px;font-weight:bold;cursor:pointer;margin-top:10px;width:100%}
+button:active{transform:scale(.98)}
+button.secondary{background:#e9e1ff;color:#5435b5}
+button.green{background:#26a66a}
+.hidden{display:none}
+.question{text-align:center;font-size:35px;font-weight:bold;padding:20px}
+.answer{font-size:25px;text-align:center}
+.feedback{text-align:center;font-size:20px;font-weight:bold;min-height:32px;margin:10px}
+.stats{display:flex;justify-content:space-around;text-align:center;gap:8px}
+.stat{background:#f1ebff;border-radius:14px;padding:12px;flex:1}
+.stat strong{display:block;font-size:24px;color:#6947d2}
+.small{font-size:13px;color:#756b8c;text-align:center}
+.row{padding:10px;border-bottom:1px solid #eee}
+footer{text-align:center;padding:20px;color:#82779c}
+</style>
+</head>
+<body>
+<header>
+<h1>🌈 Matekkaland</h1>
+<p>Tanulj, játssz, gyűjts csillagokat!</p>
+</header>
+
+<main>
+<section id="home">
+<div class="card">
+<div class="mascot">🦊</div>
+<h2>Szia, kis matematikus!</h2>
+<p style="text-align:center">Róka Robi már várja, hogy együtt kalandozzatok a számok világában!</p>
+<label>Válaszd ki az osztályodat!</label>
+<select id="grade">
+<option value="1">1. osztály</option>
+<option value="2">2. osztály</option>
+<option value="3">3. osztály</option>
+<option value="4">4. osztály</option>
+<option value="5">5. osztály</option>
+<option value="6">6. osztály</option>
+</select>
+<label>Hogy hívnak?</label>
+<input id="player" placeholder="Írd be a neved!">
+<button onclick="startGame()">🎮 Induljon a kaland!</button>
+</div>
+<div class="card">
+<h2>👨‍👩‍👧 Szülőknek</h2>
+<button class="secondary" onclick="showParent()">📊 Eredmények megtekintése</button>
+</div>
+</section>
+
+<section id="game" class="hidden">
+<div class="card">
+<div class="stats">
+<div class="stat">⭐ Pont<strong id="points">0</strong></div>
+<div class="stat">🔥 Sorozat<strong id="streak">0</strong></div>
+<div class="stat">📚 Osztály<strong id="gradeShow">1</strong></div>
+</div>
+<div class="mascot">🦊</div>
+<h2 id="topic">Számoljunk!</h2>
+<div class="question" id="question"></div>
+<input id="answer" class="answer" type="number" placeholder="Ide írd a választ!">
+<button onclick="checkAnswer()">Ellenőrzés ✓</button>
+<div class="feedback" id="feedback"></div>
+<button class="secondary" onclick="nextQuestion()">Következő feladat ➜</button>
+<button class="secondary" onclick="goHome()">Kilépés</button>
+</div>
+</section>
+
+<section id="parent" class="hidden">
+<div class="card">
+<div class="mascot">👨‍👩‍👧</div>
+<h2>Szülői eredmények</h2>
+<div id="results"></div>
+<button class="secondary" onclick="goHome()">Vissza</button>
+<button class="secondary" onclick="clearResults()">Eredmények törlése</button>
+</div>
+</section>
+</main>
+<footer>Matekkaland • Minden helyes válasz egy újabb kaland! ⭐</footer>
+
+<script>
+let grade=1,player="Játékos",points=0,streak=0;
+let correct=0,currentQuestion="",answered=false;
+let mistakes=[];
+let history=JSON.parse(localStorage.getItem("matekkaland_history")||"[]");
+
+function show(id){
+["home","game","parent"].forEach(x=>document.getElementById(x).classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+}
+function startGame(){
+grade=Number(document.getElementById("grade").value);
+player=document.getElementById("player").value.trim()||"Játékos";
+points=0;streak=0;mistakes=[];answered=false;
+document.getElementById("points").textContent=points;
+document.getElementById("streak").textContent=streak;
+document.getElementById("gradeShow").textContent=grade;
+show("game");nextQuestion();
+}
+function rand(n){return Math.floor(Math.random()*n)+1}
+function makeQuestion(){
+let a,b,op;
+if(grade===1){a=rand(10);b=rand(10);op=Math.random()<.5?"+":"-";}
+else if(grade===2){a=rand(30);b=rand(30);op=Math.random()<.5?"+":"-";}
+else if(grade===3){a=rand(10);b=rand(10);op=Math.random()<.5?"×":"÷";}
+else if(grade===4){a=rand(20);b=rand(20);op=Math.random()<.5?"×":"+";}
+else if(grade===5){a=rand(100);b=rand(20);op=Math.random()<.5?"×":"-";}
+else{a=rand(100);b=rand(20);op=Math.random()<.5?"×":"÷";}
+if(op==="-"&&b>a)[a,b]=[b,a];
+if(op==="÷"){a=a*b;}
+let answer;
+if(op==="+")answer=a+b;
+if(op==="-")answer=a-b;
+if(op==="×")answer=a*b;
+if(op==="÷")answer=a/b;
+return {text:a+" "+op+" "+b+" = ?",answer};
+}
+function nextQuestion(){
+let q=makeQuestion();
+currentQuestion=q.text;correct=q.answer;answered=false;
+document.getElementById("question").textContent=q.text;
+document.getElementById("answer").value="";
+document.getElementById("feedback").textContent="";
+document.getElementById("answer").focus();
+}
+function checkAnswer(){
+if(answered)return;
+let input=document.getElementById("answer").value;
+if(input===""){document.getElementById("feedback").textContent="Írd be a választ!";return;}
+answered=true;
+let value=Number(input);
+if(value===correct){
+points+=10;streak++;
+document.getElementById("feedback").textContent="🎉 Ügyes vagy! +10 pont!";
+}else{
+streak=0;
+document.getElementById("feedback").textContent="💛 Nem baj! A helyes válasz: "+correct;
+mistakes.push({question:currentQuestion,answer:correct});
+}
+document.getElementById("points").textContent=points;
+document.getElementById("streak").textContent=streak;
+}
+function goHome(){
+history.push({player,grade,points,mistakes:mistakes.slice(),date:new Date().toLocaleString("hu-HU")});
+localStorage.setItem("matekkaland_history",JSON.stringify(history));
+show("home");
+}
+function showParent(){
+history=JSON.parse(localStorage.getItem("matekkaland_history")||"[]");
+let box=document.getElementById("results");
+if(!history.length){box.innerHTML="<p>Még nincs elmentett eredmény.</p>";}
+else{
+box.innerHTML=history.slice().reverse().map(x=>
+`<div class="row"><b>${escapeHTML(x.player)}</b> • ${x.grade}. osztály<br>⭐ ${x.points} pont<br><span class="small">${escapeHTML(x.date)}</span><br>❌ Hibás feladatok: ${x.mistakes.length}<br>${x.mistakes.map(m=>escapeHTML(m.question)+" Helyes válasz: "+m.answer).join("<br>")}</div>`
+).join("");
+}
+show("parent");
+}
+function clearResults(){
+if(confirm("Biztosan törlöd az összes eredményt?")){
+history=[];localStorage.removeItem("matekkaland_history");showParent();
+}
+}
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+</script>
+</body>
+  </html>
