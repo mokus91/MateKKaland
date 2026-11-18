@@ -38,6 +38,31 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
 .spark{position:fixed;z-index:99;pointer-events:none;font-size:25px;animation:sparkle .9s ease-out forwards}
 #game .card{overflow:hidden}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+
+/* Látványos, játékos 3D-s megjelenés */
+body{background:radial-gradient(ellipse at 50% 0%,#fff 0,#e7ddff 42%,#c9eaff 100%);perspective:1200px}
+header{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#ff75aa 0%,#9364ed 48%,#36bfe0 100%);box-shadow:0 13px 0 #5335a8,0 22px 35px #39207838;transform:translateZ(0)}
+header:before,header:after{content:"";position:absolute;z-index:-1;border-radius:50%;background:#ffffff26;filter:blur(1px)}
+header:before{width:190px;height:190px;left:-55px;top:-85px}header:after{width:150px;height:150px;right:-35px;bottom:-75px}
+.card{position:relative;transform:translateZ(0);box-shadow:0 8px 0 #d8cafa,0 17px 28px #50318d24;border:1px solid #fff;transition:transform .22s,box-shadow .22s}
+.card:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,#ffffffa8,transparent 42%)}
+.card:active{transform:translateY(3px);box-shadow:0 4px 0 #d8cafa,0 9px 17px #50318d20}
+.mascot{display:inline-block;filter:drop-shadow(0 9px 2px #49317840) drop-shadow(0 0 12px #fff8);transform-style:preserve-3d;text-shadow:0 5px 0 #ffffff55}
+.world,.character,.stat,.pill{box-shadow:0 5px 0 #d8c9f2,0 9px 14px #51328c18;transform:translateY(0);transition:transform .18s,box-shadow .18s}
+.world:active,.character:active{transform:translateY(4px);box-shadow:0 1px 0 #d8c9f2}
+.world{border-radius:20px 20px 25px 25px;border-bottom:5px solid #d5c2f1;position:relative}
+.world span{font-size:35px;filter:drop-shadow(0 4px 2px #46307744)}
+button{border-radius:17px;border-bottom:5px solid #39228c;background:linear-gradient(180deg,#8664ed,#5838c1);box-shadow:0 7px 14px #5133aa30;transition:transform .12s,filter .12s}
+button:active{transform:translateY(4px);border-bottom-width:1px;filter:brightness(.96)}
+button.secondary{border-bottom:4px solid #d4c6f1;background:linear-gradient(180deg,#fff,#eee7ff)}
+button.gold{border-bottom:4px solid #e8c66c;background:linear-gradient(180deg,#fff6d9,#ffe5a0)}
+input,select{box-shadow:inset 0 3px 6px #4d32850c,0 3px 0 #e5dcf7}
+.question{margin:10px 0;border-radius:22px;background:linear-gradient(145deg,#fff,#e9e0ff);box-shadow:inset 0 3px 9px #fff,0 7px 0 #cbb8f1,0 13px 22px #5235a51c;text-shadow:0 2px #fff}
+.fun-scene span{filter:drop-shadow(0 7px 2px #51328c30)}
+#soundToggle{display:inline-block;margin:12px auto 0;border:0;border-bottom:4px solid #d4c6f1;box-shadow:0 5px 10px #3920782b}
+#soundHint{font-size:12px;color:#fff;margin:5px 0 0}
+@media(prefers-reduced-motion:reduce){.card,.world,.character,button{transition:none}}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -145,38 +170,44 @@ if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.se
 </script>
 
 
+
 <script>
-/* MateKKaland: hangmotor, fejtörők és vidám visszajelzések */
+/* Stabil, telefonbarát hangmotor: első érintéskor feloldja a böngésző hangját */
 (function(){
- let soundOn=true, audioCtx=null;
- const soundButton=document.createElement("button");
- soundButton.id="soundToggle";soundButton.type="button";soundButton.textContent="🔊 Hang: BE";
- document.querySelector("header").appendChild(soundButton);
- soundButton.addEventListener("click",()=>{soundOn=!soundOn;soundButton.textContent=soundOn?"🔊 Hang: BE":"🔇 Hang: KI";if(soundOn)tone(660,.12)});
- function tone(freq,duration,type="sine",volume=.07){
-  if(!soundOn)return;
-  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(volume,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}
+ let enabled=true,ctx=null,master=null,unlocked=false;
+ function unlock(){
+  try{
+   const AC=window.AudioContext||window.webkitAudioContext;
+   if(!AC)return false;
+   if(!ctx){ctx=new AC();master=ctx.createGain();master.gain.value=.55;master.connect(ctx.destination);}
+   if(ctx.state==="suspended")ctx.resume();
+   unlocked=true;return true;
+  }catch(e){return false}
  }
- function cheer(){tone(523,.12);setTimeout(()=>tone(659,.12),100);setTimeout(()=>tone(784,.22),210)}
- function oops(){tone(240,.18,"triangle",.05)}
- function sparkles(){const icons=["✨","⭐","🎉","💫","🌈"];for(let i=0;i<9;i++){const s=document.createElement("span");s.className="spark";s.textContent=icons[i%icons.length];s.style.left=(12+Math.random()*76)+"%";s.style.top=(45+Math.random()*30)+"%";document.body.appendChild(s);setTimeout(()=>s.remove(),950)}}
- const originalMake=makeQuestion;
- makeQuestion=function(){
-  if(topic==="puzzle"){
-   const kind=Math.floor(Math.random()*4),n=rand(8)+2;
-   if(kind===0)return{text:"🧩 Mi következik?  "+n+", "+(n+2)+", "+(n+4)+", ?",answer:n+6,grade,op:"fejtörő"};
-   if(kind===1)return{text:"🧩 Mi következik?  "+(n*2)+", "+(n*4)+", "+(n*6)+", ?",answer:n*8,grade,op:"fejtörő"};
-   if(kind===2)return{text:"🧩 Hány lába van 2 cicának?",answer:8,grade,op:"fejtörő"};
-   return{text:"🧩 5 madár ül az ágon. 2 elrepül. Hány marad?",answer:3,grade,op:"fejtörő"};
-  }
-  return originalMake();
- };
- const originalCheck=checkAnswer;
- checkAnswer=function(){const was=answered;originalCheck();if(!was&&answered){const good=document.getElementById("feedback").classList.contains("good");if(good){cheer();sparkles();}else{oops();}}};
- const originalStart=startGame;
- startGame=function(){originalStart();if(!document.getElementById("game").classList.contains("hidden"))tone(587,.12)};
- const originalFinish=finishGame;
- finishGame=function(){if(done>0)cheer();originalFinish()};
+ function beep(freq=600,duration=.16,wave="sine",volume=.22,delay=0){
+  if(!enabled)return;
+  if(!unlock())return;
+  try{
+   const now=ctx.currentTime+delay,osc=ctx.createOscillator(),gain=ctx.createGain();
+   osc.type=wave;osc.frequency.setValueAtTime(freq,now);
+   gain.gain.setValueAtTime(.001,now);gain.gain.linearRampToValueAtTime(volume,now+.018);
+   gain.gain.exponentialRampToValueAtTime(.001,now+duration);
+   osc.connect(gain);gain.connect(master);osc.start(now);osc.stop(now+duration+.03);
+  }catch(e){}
+ }
+ function success(){beep(523,.18,"sine",.24);beep(659,.18,"sine",.24,.16);beep(784,.3,"sine",.27,.32)}
+ function error(){beep(260,.22,"triangle",.2);beep(190,.25,"triangle",.16,.18)}
+ function start(){beep(660,.12);beep(880,.18,"sine",.2,.12)}
+ function test(){unlock();success();if(!unlocked&&"speechSynthesis"in window){const u=new SpeechSynthesisUtterance("Szuper! A hang működik!");u.lang="hu-HU";speechSynthesis.speak(u)}}
+ document.addEventListener("pointerdown",unlock,{once:true,passive:true});
+ document.addEventListener("touchstart",unlock,{once:true,passive:true});
+ const b=document.createElement("button");b.id="soundToggle";b.type="button";b.textContent="🔊 Hangok: BE";
+ const hint=document.createElement("div");hint.id="soundHint";hint.textContent="Érintsd meg a hangpróbát, és engedélyezd a telefon hangját.";
+ const testBtn=document.createElement("button");testBtn.type="button";testBtn.textContent="🎵 Hangpróba";testBtn.style.cssText="width:auto;margin:8px auto 0;padding:8px 14px;background:linear-gradient(#fff,#eee7ff);color:#5638ad;border:0;border-bottom:4px solid #d4c6f1";
+ const box=document.createElement("div");box.style.cssText="text-align:center;position:relative;z-index:2";box.append(b,testBtn,hint);document.querySelector("header").appendChild(box);
+ b.addEventListener("click",()=>{enabled=!enabled;b.textContent=enabled?"🔊 Hangok: BE":"🔇 Hangok: KI";if(enabled){unlock();start()}hint.textContent=enabled?"A hangok be vannak kapcsolva.":"A hangok ki vannak kapcsolva."});
+ testBtn.addEventListener("click",()=>{enabled=true;b.textContent="🔊 Hangok: BE";unlock();test();hint.textContent="🎶 Hangpróba elindítva!"});
+ window.MKSound={success,error,start,test,isEnabled:()=>enabled};
 })();
 </script>
 </body></html>
