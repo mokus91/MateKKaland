@@ -24,6 +24,20 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
 @media(min-width:560px){.grid.characters{grid-template-columns:repeat(4,1fr)}}@media(max-width:380px){main{padding:9px}.card{padding:14px}.two{grid-template-columns:1fr}}
 
 #installAppBar{position:sticky;top:0;z-index:20;margin:10px auto 0;width:min(730px,calc(100% - 20px));padding:10px 12px;border-radius:16px;background:linear-gradient(100deg,#5b3cc4,#a45de0);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 5px 18px #5232a533;font-weight:700}#installAppBar button{width:auto;white-space:nowrap;margin:0;background:#fff;color:#5736b4;padding:9px 13px;font-size:14px}#installAppBar small{display:block;font-weight:500;opacity:.9}@media(max-width:420px){#installAppBar{font-size:13px}#installAppBar button{font-size:12px;padding:8px}}
+
+/* Vidám animációk és hangok */
+@keyframes wiggle{0%,100%{transform:rotate(0) translateY(0)}25%{transform:rotate(-7deg) translateY(-4px)}75%{transform:rotate(7deg) translateY(-4px)}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-15px) rotate(5deg)}}
+@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
+@keyframes sparkle{0%{transform:translateY(0) scale(.5);opacity:1}100%{transform:translateY(-90px) scale(1.4);opacity:0}}
+.mascot{animation:buddy 2.2s ease-in-out infinite,wiggle 5s ease-in-out infinite}
+.adventure .world{animation:floaty 3.5s ease-in-out infinite}.adventure .world:nth-child(2){animation-delay:.5s}.adventure .world:nth-child(3){animation-delay:1s}
+.fun-scene{display:flex;justify-content:space-around;align-items:center;gap:8px;font-size:clamp(28px,8vw,48px);padding:7px 0}
+.fun-scene span{display:inline-block;animation:floaty 2.8s ease-in-out infinite}.fun-scene span:nth-child(2){animation-delay:.4s}.fun-scene span:nth-child(3){animation-delay:.8s}.fun-scene span:nth-child(4){animation-delay:1.2s}
+#soundToggle{width:auto;margin:0;padding:8px 12px;font-size:13px;background:#fff;color:#5638ad;border:2px solid #e7defb;box-shadow:none}
+.spark{position:fixed;z-index:99;pointer-events:none;font-size:25px;animation:sparkle .9s ease-out forwards}
+#game .card{overflow:hidden}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -32,7 +46,7 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
 <body>
 <div id="installAppBar"><div>📲 MateKKaland telepítése<small>Legyen saját ikonja a telefonodon!</small></div><button id="installAppBtn" type="button">Telepítés</button></div>
 
-<header><h1>🌈 MateKKaland</h1><p>Tanulj, játssz, fejlődj – minden csillag számít!</p></header>
+<header><h1>🌈 MateKKaland</h1><p>Tanulj, játssz, fejlődj – minden csillag számít!</p><div class="fun-scene" aria-label="Vidám kalandfigurák"><span>🦋</span><span>🐸</span><span>🌟</span><span>🎈</span></div></header>
 <main>
 <section id="home">
  <div class="card hero">
@@ -41,7 +55,7 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
   <label for="profileSelect">Gyermekprofil</label><select id="profileSelect" onchange="switchProfile(this.value)"></select><div class="two"><button class="secondary" onclick="addProfile()">➕ Új gyermek</button><button class="secondary" onclick="renameProfile()">✏️ Név módosítása</button></div><label for="player">A játékos neve</label><input id="player" maxlength="24" placeholder="Hogy hívnak?">
   <label for="grade">Melyik osztályba jársz?</label><select id="grade"><option value="1">1. osztály</option><option value="2">2. osztály</option><option value="3">3. osztály</option><option value="4">4. osztály</option><option value="5">5. osztály</option><option value="6">6. osztály</option></select>
   <label>Válassz társat!</label><div class="grid characters" id="characters"></div>
-  <label for="topic">Milyen feladatot szeretnél?</label><select id="topic"><option value="mixed">🎲 Vegyes gyakorlás</option><option value="plusminus">➕ Összeadás és kivonás</option><option value="multiply">✖️ Szorzás és osztás</option><option value="challenge">🏆 Napi kihívás</option><option value="mistakes">💡 Korábbi hibáim gyakorlása</option></select>
+  <label for="topic">Milyen feladatot szeretnél?</label><select id="topic"><option value="mixed">🎲 Vegyes gyakorlás</option><option value="plusminus">➕ Összeadás és kivonás</option><option value="multiply">✖️ Szorzás és osztás</option><option value="challenge">🏆 Napi kihívás</option><option value="mistakes">💡 Korábbi hibáim gyakorlása</option><option value="puzzle">🧩 Vidám logikai fejtörők</option></select>
   <button onclick="startGame()">🚀 Induljon a kaland!</button>
  </div>
  <div class="card"><h2>🗺️ Kalandtérkép</h2><p class="sub">Minden gyakorlással újabb világok várnak!</p><div class="adventure"><div class="world"><span>🌳</span>Számerdő</div><div class="world"><span>🏰</span>Összeadás-vár</div><div class="world"><span>🚀</span>Szorzás-galaxis</div></div><p class="small" style="text-align:center">10 feladat = egy kalandkör • 50 csillag = új szint</p></div><div class="card"><h2>⭐ Az én gyűjteményem</h2><div class="stats"><div class="stat">Összes csillag<strong id="totalStars">0</strong></div><div class="stat">Megoldott feladat<strong id="totalDone">0</strong></div><div class="stat">Jelvények<strong id="badgeCount">0</strong></div></div><div class="stat" style="margin-top:9px">🔥 Napi kihívás-sorozat<strong id="dailyStreak">0 nap</strong></div><p class="small" id="dailyStatus" style="text-align:center;margin-bottom:0">A mai kihívás még vár rád!</p><div id="badges" class="pills" style="margin-top:12px"></div></div>
@@ -51,7 +65,7 @@ footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
  <div class="card">
   <div class="stats"><div class="stat">⭐ Csillag<strong id="points">0</strong></div><div class="stat">🔥 Jó sorozat<strong id="streak">0</strong></div><div class="stat">📘 Feladat<strong id="count">1/10</strong></div></div>
   <div class="progress"><span id="bar"></span></div>
-  <div class="hero"><div class="mascot" id="gameMascot">🦊</div><div class="pills"><span class="pill" id="playerPill">Játékos</span><span class="pill" id="gradePill">1. osztály</span><span class="pill" id="levelPill">1. szint</span></div></div>
+  <div class="hero"><div class="fun-scene"><span>🦋</span><span>⭐</span><span>🐝</span><span>🎈</span></div><div class="mascot" id="gameMascot">🦊</div><div class="pills"><span class="pill" id="playerPill">Játékos</span><span class="pill" id="gradePill">1. osztály</span><span class="pill" id="levelPill">1. szint</span></div></div>
   <h2 id="topicTitle">Számoljunk!</h2><div class="question" id="question">2 + 3 = ?</div>
   <input id="answer" class="answer" type="number" inputmode="decimal" placeholder="Írd ide a választ!" autocomplete="off">
   <button id="checkBtn" onclick="checkAnswer()">Ellenőrzés ✓</button><div id="feedback" class="feedback" aria-live="polite"></div>
@@ -130,4 +144,39 @@ matekInstallBtn.addEventListener("click",async()=>{if(matekInstallPrompt){matekI
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(err=>console.log("Offline mód nem aktiválódott:",err)));}
 </script>
 
+
+<script>
+/* MateKKaland: hangmotor, fejtörők és vidám visszajelzések */
+(function(){
+ let soundOn=true, audioCtx=null;
+ const soundButton=document.createElement("button");
+ soundButton.id="soundToggle";soundButton.type="button";soundButton.textContent="🔊 Hang: BE";
+ document.querySelector("header").appendChild(soundButton);
+ soundButton.addEventListener("click",()=>{soundOn=!soundOn;soundButton.textContent=soundOn?"🔊 Hang: BE":"🔇 Hang: KI";if(soundOn)tone(660,.12)});
+ function tone(freq,duration,type="sine",volume=.07){
+  if(!soundOn)return;
+  try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(volume,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}
+ }
+ function cheer(){tone(523,.12);setTimeout(()=>tone(659,.12),100);setTimeout(()=>tone(784,.22),210)}
+ function oops(){tone(240,.18,"triangle",.05)}
+ function sparkles(){const icons=["✨","⭐","🎉","💫","🌈"];for(let i=0;i<9;i++){const s=document.createElement("span");s.className="spark";s.textContent=icons[i%icons.length];s.style.left=(12+Math.random()*76)+"%";s.style.top=(45+Math.random()*30)+"%";document.body.appendChild(s);setTimeout(()=>s.remove(),950)}}
+ const originalMake=makeQuestion;
+ makeQuestion=function(){
+  if(topic==="puzzle"){
+   const kind=Math.floor(Math.random()*4),n=rand(8)+2;
+   if(kind===0)return{text:"🧩 Mi következik?  "+n+", "+(n+2)+", "+(n+4)+", ?",answer:n+6,grade,op:"fejtörő"};
+   if(kind===1)return{text:"🧩 Mi következik?  "+(n*2)+", "+(n*4)+", "+(n*6)+", ?",answer:n*8,grade,op:"fejtörő"};
+   if(kind===2)return{text:"🧩 Hány lába van 2 cicának?",answer:8,grade,op:"fejtörő"};
+   return{text:"🧩 5 madár ül az ágon. 2 elrepül. Hány marad?",answer:3,grade,op:"fejtörő"};
+  }
+  return originalMake();
+ };
+ const originalCheck=checkAnswer;
+ checkAnswer=function(){const was=answered;originalCheck();if(!was&&answered){const good=document.getElementById("feedback").classList.contains("good");if(good){cheer();sparkles();}else{oops();}}};
+ const originalStart=startGame;
+ startGame=function(){originalStart();if(!document.getElementById("game").classList.contains("hidden"))tone(587,.12)};
+ const originalFinish=finishGame;
+ finishGame=function(){if(done>0)cheer();originalFinish()};
+})();
+</script>
 </body></html>
