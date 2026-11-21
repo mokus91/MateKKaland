@@ -62,9 +62,41 @@ function savedIds(){try{return JSON.parse(localStorage.getItem('xhub-saved')||'[
 function saveToggle(id){const a=savedIds();const n=a.includes(String(id))?a.filter(x=>x!==String(id)):[...a,String(id)];localStorage.setItem('xhub-saved',JSON.stringify(n));return n.includes(String(id))}
 function render(v){const id=String(v.id??'');const title=esc(v.title||'Video');const studio=esc(v.studio?.name||'External catalogue');const duration=esc(v.duration||'');const views=Number(v.view_count||0).toLocaleString();const thumb=esc(v.thumbnail||'');const isSaved=savedIds().includes(id);return '<article class="tile" data-id="'+esc(id)+'"><div class="thumb"><img src="'+thumb+'" alt="" loading="lazy" onerror="this.remove();this.parentElement.classList.add(\'no-thumb\')"><span class="duration">'+duration+'</span><button class="save '+(isSaved?'saved':'')+'" data-save="'+esc(id)+'" aria-label="Save video">'+(isSaved?'♥':'♡')+'</button></div><div class="tile-body"><span class="tag">'+studio+'</span><h3 title="'+title+'">'+title+'</h3><div class="tile-foot"><span>External partner</span><span>18+</span></div><button class="watch" data-video="'+esc(id)+'">Watch video ▶</button></div></article>';}
 function paint(items){const shown=savedOnly?items.filter(v=>savedIds().includes(String(v.id))):items;cards.innerHTML=shown.map(render).join('');if(savedOnly&&!shown.length)status.textContent='No saved videos on this device yet.';}
-async function loadFilms(append=false){if(busy)return;busy=true;status.textContent='Loading catalogue…';more.disabled=true;try{let data;if(sort==='newest'&&!searchTerm){try{const res=await fetch('./catalog.json?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('No snapshot yet');data=await res.json();}catch(snapshotError){const live=await fetch(API+'?'+new URLSearchParams({orientation:'all',page:String(page),page_size:'18',sort:'newest'}),{headers:apiHeaders});if(!live.ok)throw new Error('API HTTP '+live.status);data=await live.json();}}else{const p=new URLSearchParams({orientation:'all',page:String(page),page_size:'18',sort,...(searchTerm?{search:searchTerm}:{})});const res=await fetch(API+'?'+p.toString(),{headers:{'X-Site-URL':location.origin}});if(!res.ok)throw new Error('API HTTP '+res.status);data=await res.json();}const items=Array.isArray(data.results)?data.results:[];if(!append)currentItems=[];currentItems=currentItems.concat(items);paint(currentItems);document.getElementById('resultCount').textContent=(data.count??currentItems.length)+' results';const stamp=data.generated_at?' · refreshed '+new Date(data.generated_at).toLocaleString():' · live external catalogue';status.textContent=items.length?'Listings supplied by the external catalogue'+stamp+'.':'No results found.';more.hidden=sort==='newest'&&!searchTerm?true:!data.next;page++;}catch(e){status.textContent='Catalogue error: '+(e?.message||'unknown error')+'. Ellenőrizd az internetkapcsolatot, majd próbáld újra.';console.error(e);}finally{busy=false;more.disabled=false;}}
+async function loadFilms(append=false){if(busy)return;busy=true;status.textContent='Loading catalogue…';more.disabled=true;try{let data;if(sort==='newest'&&!searchTerm){try{const res=await fetch('./catalog.json?ts='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('No snapshot yet');data=await res.json();}catch(snapshotError){const live=await fetch(API+'?'+new URLSearchParams({orientation:'all',page:String(page),page_size:'18',sort:'newest'}),{headers:apiHeaders});if(!live.ok)throw new Error('API HTTP '+live.status);data=await live.json();}}else{const p=new URLSearchParams({orientation:'all',page:String(page),page_size:'18',sort,...(searchTerm?{search:searchTerm}:{})});const res=await fetch(API+'?'+p.toString(),{headers:apiHeaders});if(!res.ok)throw new Error('API HTTP '+res.status);data=await res.json();}const items=Array.isArray(data.results)?data.results:[];if(!append)currentItems=[];currentItems=currentItems.concat(items);paint(currentItems);document.getElementById('resultCount').textContent=(data.count??currentItems.length)+' results';const stamp=data.generated_at?' · refreshed '+new Date(data.generated_at).toLocaleString():' · live external catalogue';status.textContent=items.length?'Listings supplied by the external catalogue'+stamp+'.':'No results found.';more.hidden=sort==='newest'&&!searchTerm?true:!data.next;page++;}catch(e){status.textContent='Catalogue error: '+(e?.message||'unknown error')+'. Ellenőrizd az internetkapcsolatot, majd próbáld újra.';console.error(e);}finally{busy=false;more.disabled=false;}}
 function setSort(next){sort=next;savedOnly=false;page=1;document.getElementById('popularBtn').classList.toggle('active',sort==='popular');document.getElementById('newBtn').classList.toggle('active',sort==='newest');document.getElementById('savedBtn').classList.remove('active');document.getElementById('catalogTitle').textContent=sort==='popular'?'Popular videos':'Latest videos';loadFilms();}
-cards.addEventListener('click',e=>{const save=e.target.closest('[data-save]');if(save){saveToggle(save.dataset.save);paint(currentItems);return;}const b=e.target.closest('[data-video]');if(b){const id=b.dataset.video;const title=b.closest('.tile').querySelector('h3').textContent;document.getElementById('playerTitle').textContent=title;const playerUrl='https://adultembed.com/player/embed/'+encodeURIComponent(id)+'/';const frame=document.getElementById('filmPlayer');const box=document.getElementById('playerBox');box.hidden=false;frame.src='about:blank';requestAnimationFrame(()=>{frame.src=playerUrl;document.getElementById('openExternalPlayer').href=playerUrl;});box.scrollIntoView({behavior:'smooth',block:'start'});}});
+async function requestPlayerUrl(id){
+ const endpoint='https://adultembed.com/api/videos/'+encodeURIComponent(id)+'/get-embed/';
+ const response=await fetch(endpoint,{method:'POST',headers:{'X-Site-URL':SITE_URL,'Accept':'application/json'}});
+ if(!response.ok)throw new Error('Player API HTTP '+response.status);
+ const data=await response.json();
+ let url=data.player_url||data.url||data.embed_url||'';
+ if(!url&&data.embed_code){const doc=new DOMParser().parseFromString(data.embed_code,'text/html');url=doc.querySelector('iframe')?.src||'';}
+ if(!url)throw new Error('A szolgáltató nem adott lejátszócímet ehhez a videóhoz.');
+ return url;
+}
+cards.addEventListener('click',async e=>{
+ const save=e.target.closest('[data-save]');
+ if(save){saveToggle(save.dataset.save);paint(currentItems);return;}
+ const b=e.target.closest('[data-video]');
+ if(!b)return;
+ const id=b.dataset.video,title=b.closest('.tile').querySelector('h3').textContent;
+ const frame=document.getElementById('filmPlayer'),box=document.getElementById('playerBox');
+ const direct=document.getElementById('openExternalPlayer');
+ document.getElementById('playerTitle').textContent=title;
+ status.textContent='Secure player link requested…';
+ box.hidden=false;frame.src='about:blank';direct.href='https://adultembed.com/';
+ box.scrollIntoView({behavior:'smooth',block:'start'});
+ b.disabled=true;
+ try{
+  const playerUrl=await requestPlayerUrl(id);
+  direct.href=playerUrl;
+  frame.src=playerUrl;
+  status.textContent='Player loaded. If it still does not play, the source provider may be unavailable.';
+ }catch(err){
+  status.textContent='Player error: '+(err?.message||'unknown error');
+  console.error(err);
+ }finally{b.disabled=false;}
+});
 document.getElementById('closePlayer').addEventListener('click',()=>{document.getElementById('filmPlayer').src='about:blank';document.getElementById('playerBox').hidden=true;});
 document.getElementById('moreBtn').addEventListener('click',()=>loadFilms(true));
 document.getElementById('popularBtn').addEventListener('click',()=>setSort('popular'));
