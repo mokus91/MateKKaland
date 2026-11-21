@@ -1,225 +1,53 @@
 <!doctype html>
-<html lang="hu">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#5b3cc4">
-<title>MateKKaland – játékos matematika</title>
-<style>
-:root{--purple:#5b3cc4;--violet:#8a62e8;--ink:#292044;--muted:#746b8e;--paper:#fff;--bg:#f4f0ff;--line:#e7defb;--green:#168653;--red:#c44758;--gold:#f4b942}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,#eee6ff,transparent 38%),var(--bg);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink)}
-header{background:linear-gradient(115deg,#ff79ad,#9168ec 52%,#51bce8);color:#fff;padding:25px 16px 32px;text-align:center;border-radius:0 0 34px 34px;box-shadow:0 8px 24px #5232a52b}header h1{text-shadow:0 3px 0 #5732a044}
-header h1{margin:0;font-size:clamp(26px,6vw,36px)}header p{margin:6px 0 0;opacity:.93}
-main{width:min(760px,100%);margin:auto;padding:14px}.card{background:var(--paper);border:2px solid #fff;border-radius:24px;padding:19px;margin:13px 0;box-shadow:0 8px 24px #6849b51a}.card:nth-child(3n+1){border-color:#ffe1ed}.card:nth-child(3n+2){border-color:#d9f3ff}
-h2{text-align:center;margin:5px 0 15px}h3{margin:5px 0 10px}.hero{text-align:center}.mascot{font-size:82px;line-height:1.2;filter:drop-shadow(0 5px 2px #33204a16);animation:buddy 2.8s ease-in-out infinite}@keyframes buddy{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}.adventure{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.world{border-radius:18px;padding:12px 6px;text-align:center;font-weight:800;color:#47356e;background:linear-gradient(145deg,#fff0c9,#ffe2e9);border:2px solid #fff}.world:nth-child(2){background:linear-gradient(145deg,#dff7ff,#e9e2ff)}.world:nth-child(3){background:linear-gradient(145deg,#dcf9e9,#fff3d2)}.world span{display:block;font-size:29px}.sub{color:var(--muted);text-align:center;line-height:1.5}
-label{display:block;font-weight:700;margin:13px 0 6px}input,select{width:100%;padding:13px;border:2px solid var(--line);border-radius:13px;font-size:16px;background:#fff;color:var(--ink)}
-button{border:0;border-radius:14px;padding:13px 16px;background:var(--purple);color:white;font-size:16px;font-weight:750;cursor:pointer;margin-top:10px;width:100%;box-shadow:0 4px 10px #5133aa18}button:active{transform:scale(.985)}button.secondary{background:#eee8ff;color:#5033ae;box-shadow:none}button.green{background:var(--green)}button.gold{background:#fff1c9;color:#765000;box-shadow:none}button.danger{background:#fff0f1;color:#a32e42;box-shadow:none}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.character{border:2px solid var(--line);border-radius:15px;padding:10px;text-align:center;cursor:pointer;background:#fff}.character.selected{border-color:var(--violet);background:#f4efff;box-shadow:0 0 0 2px #8a62e822}.character span{display:block;font-size:36px}.character b{font-size:14px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f4efff;border-radius:14px;padding:10px;text-align:center;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:23px;color:var(--purple)}
-.hidden{display:none!important}.question{font-size:clamp(30px,8vw,44px);font-weight:850;text-align:center;padding:22px 4px}.answer{font-size:24px;text-align:center;font-weight:700}.feedback{text-align:center;min-height:32px;font-weight:750;font-size:18px;margin:10px 0}.good{color:var(--green)}.bad{color:var(--red)}
-.pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.pill{background:#f0eaff;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:700}
-.progress{height:11px;background:#eee9f8;border-radius:99px;overflow:hidden;margin:10px 0}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#6c49d5,#b18af6);transition:width .25s}
-.row{padding:12px 2px;border-bottom:1px solid #eee9f8;line-height:1.55}.row:last-child{border:0}.small{font-size:12px;color:var(--muted)}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-footer{text-align:center;color:#82779c;padding:18px;font-size:13px}
-@media(min-width:560px){.grid.characters{grid-template-columns:repeat(4,1fr)}}@media(max-width:380px){main{padding:9px}.card{padding:14px}.two{grid-template-columns:1fr}}
-
-#installAppBar{position:sticky;top:0;z-index:20;margin:10px auto 0;width:min(730px,calc(100% - 20px));padding:10px 12px;border-radius:16px;background:linear-gradient(100deg,#5b3cc4,#a45de0);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 5px 18px #5232a533;font-weight:700}#installAppBar button{width:auto;white-space:nowrap;margin:0;background:#fff;color:#5736b4;padding:9px 13px;font-size:14px}#installAppBar small{display:block;font-weight:500;opacity:.9}@media(max-width:420px){#installAppBar{font-size:13px}#installAppBar button{font-size:12px;padding:8px}}
-
-/* Vidám animációk és hangok */
-@keyframes wiggle{0%,100%{transform:rotate(0) translateY(0)}25%{transform:rotate(-7deg) translateY(-4px)}75%{transform:rotate(7deg) translateY(-4px)}}
-@keyframes floaty{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-15px) rotate(5deg)}}
-@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
-@keyframes sparkle{0%{transform:translateY(0) scale(.5);opacity:1}100%{transform:translateY(-90px) scale(1.4);opacity:0}}
-.mascot{animation:buddy 2.2s ease-in-out infinite,wiggle 5s ease-in-out infinite}
-.adventure .world{animation:floaty 3.5s ease-in-out infinite}.adventure .world:nth-child(2){animation-delay:.5s}.adventure .world:nth-child(3){animation-delay:1s}
-.fun-scene{display:flex;justify-content:space-around;align-items:center;gap:8px;font-size:clamp(28px,8vw,48px);padding:7px 0}
-.fun-scene span{display:inline-block;animation:floaty 2.8s ease-in-out infinite}.fun-scene span:nth-child(2){animation-delay:.4s}.fun-scene span:nth-child(3){animation-delay:.8s}.fun-scene span:nth-child(4){animation-delay:1.2s}
-#soundToggle{width:auto;margin:0;padding:8px 12px;font-size:13px;background:#fff;color:#5638ad;border:2px solid #e7defb;box-shadow:none}
-.spark{position:fixed;z-index:99;pointer-events:none;font-size:25px;animation:sparkle .9s ease-out forwards}
-#game .card{overflow:hidden}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
-
-/* Látványos, játékos 3D-s megjelenés */
-body{background:radial-gradient(ellipse at 50% 0%,#fff 0,#e7ddff 42%,#c9eaff 100%);perspective:1200px}
-header{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#ff75aa 0%,#9364ed 48%,#36bfe0 100%);box-shadow:0 13px 0 #5335a8,0 22px 35px #39207838;transform:translateZ(0)}
-header:before,header:after{content:"";position:absolute;z-index:-1;border-radius:50%;background:#ffffff26;filter:blur(1px)}
-header:before{width:190px;height:190px;left:-55px;top:-85px}header:after{width:150px;height:150px;right:-35px;bottom:-75px}
-.card{position:relative;transform:translateZ(0);box-shadow:0 8px 0 #d8cafa,0 17px 28px #50318d24;border:1px solid #fff;transition:transform .22s,box-shadow .22s}
-.card:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,#ffffffa8,transparent 42%)}
-.card:active{transform:translateY(3px);box-shadow:0 4px 0 #d8cafa,0 9px 17px #50318d20}
-.mascot{display:inline-block;filter:drop-shadow(0 9px 2px #49317840) drop-shadow(0 0 12px #fff8);transform-style:preserve-3d;text-shadow:0 5px 0 #ffffff55}
-.world,.character,.stat,.pill{box-shadow:0 5px 0 #d8c9f2,0 9px 14px #51328c18;transform:translateY(0);transition:transform .18s,box-shadow .18s}
-.world:active,.character:active{transform:translateY(4px);box-shadow:0 1px 0 #d8c9f2}
-.world{border-radius:20px 20px 25px 25px;border-bottom:5px solid #d5c2f1;position:relative}
-.world span{font-size:35px;filter:drop-shadow(0 4px 2px #46307744)}
-button{border-radius:17px;border-bottom:5px solid #39228c;background:linear-gradient(180deg,#8664ed,#5838c1);box-shadow:0 7px 14px #5133aa30;transition:transform .12s,filter .12s}
-button:active{transform:translateY(4px);border-bottom-width:1px;filter:brightness(.96)}
-button.secondary{border-bottom:4px solid #d4c6f1;background:linear-gradient(180deg,#fff,#eee7ff)}
-button.gold{border-bottom:4px solid #e8c66c;background:linear-gradient(180deg,#fff6d9,#ffe5a0)}
-input,select{box-shadow:inset 0 3px 6px #4d32850c,0 3px 0 #e5dcf7}
-.question{margin:10px 0;border-radius:22px;background:linear-gradient(145deg,#fff,#e9e0ff);box-shadow:inset 0 3px 9px #fff,0 7px 0 #cbb8f1,0 13px 22px #5235a51c;text-shadow:0 2px #fff}
-.fun-scene span{filter:drop-shadow(0 7px 2px #51328c30)}
-#soundToggle{display:inline-block;margin:12px auto 0;border:0;border-bottom:4px solid #d4c6f1;box-shadow:0 5px 10px #3920782b}
-#soundHint{font-size:12px;color:#fff;margin:5px 0 0}
-@media(prefers-reduced-motion:reduce){.card,.world,.character,button{transition:none}}
-
-</style>
-
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101018">
+<meta name="description" content="XHUB — a planned international directory for verified, legal adult creators and licensed 18+ video content.">
+<title>XHUB — Your World. Your Content.</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:dark;--bg:#0c0c12;--panel:#171720;--panel2:#20202c;--line:#343443;--text:#f6f4fb;--muted:#aaa7b8;--pink:#ff477e;--purple:#8b5cf6;--gold:#f4c46b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#3a1740 0,transparent 36%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button,.btn{border:0;border-radius:12px;padding:11px 16px;background:linear-gradient(110deg,var(--pink),var(--purple));color:white;font-weight:750;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+header{position:sticky;top:0;z-index:5;background:#101018ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.bar{max-width:1180px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:20px}.logo{font-size:27px;font-weight:950;letter-spacing:1px}.logo b{color:var(--pink)}nav{display:flex;gap:18px;margin-left:auto;color:var(--muted)}nav a:hover{color:white}.wrap{max-width:1180px;margin:auto;padding:24px 20px}
+.hero{padding:46px 28px;border:1px solid #52304f;border-radius:25px;background:linear-gradient(120deg,#261525,#1a1a2a 65%,#211b38);display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:center}.eyebrow{color:#ff91b2;text-transform:uppercase;font-size:12px;font-weight:850;letter-spacing:2px}.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.04;margin:10px 0}.hero p{max-width:640px;color:#c9c4d2}.hero-art{min-height:170px;border-radius:20px;background:linear-gradient(135deg,#5b2346,#382a68);display:grid;place-items:center;font-size:58px;font-weight:950;letter-spacing:5px;color:#ffffffd9}
+.notice{margin:18px 0;padding:12px 15px;border:1px solid #66512e;border-radius:13px;background:#2a2115;color:#f2d9a8;font-size:13px}
+.ad{margin:20px 0;padding:17px;border:1px dashed #555264;border-radius:14px;text-align:center;color:#a9a5b4;background:#14141d}.ad strong{display:block;color:#d6d2df}.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:30px 0 14px}.section-head h2{margin:0;font-size:24px}.muted{color:var(--muted)}
+.filters{display:flex;gap:9px;flex-wrap:wrap}.chip{background:#22222e;border:1px solid var(--line);border-radius:99px;padding:8px 13px;color:#ddd9e7;cursor:pointer}.chip.active{background:#54233f;border-color:#a34470;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.tile{border:1px solid var(--line);background:var(--panel);border-radius:17px;overflow:hidden}.thumb{height:135px;display:grid;place-items:center;background:linear-gradient(135deg,#38223a,#262747);font-size:38px}.tile-body{padding:14px}.tag{display:inline-block;color:#ff9dbb;font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:800}.tile h3{margin:5px 0;font-size:17px}.tile p{margin:5px 0 12px;color:var(--muted);font-size:13px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}.box{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:20px}.box h2{margin:0 0 8px}.box ul{padding-left:20px;color:var(--muted)}
+form{display:grid;gap:10px}input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#101018;color:white}label{font-size:13px;color:#d2cedb}.small{font-size:12px;color:var(--muted)}
+footer{margin-top:40px;padding:28px 20px;border-top:1px solid var(--line);color:var(--muted);text-align:center}
+#ageGate{position:fixed;inset:0;z-index:20;background:#08080df5;display:grid;place-items:center;padding:20px}#ageGate .modal{max-width:470px;background:#191923;border:1px solid #494052;border-radius:22px;padding:28px;text-align:center;box-shadow:0 25px 90px #0009}#ageGate h2{font-size:32px;margin:0 0 8px}#ageGate p{color:#c1bdca}#ageGate .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}#ageGate .no{background:#343440}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding:28px 20px}.hero-art{min-height:100px;font-size:42px}.grid{grid-template-columns:1fr 1fr}.cols{grid-template-columns:1fr}nav{gap:10px;font-size:13px}.bar{gap:12px;padding:12px}.logo{font-size:23px}}
+@media(max-width:440px){.grid{grid-template-columns:1fr}nav a:nth-child(2){display:none}.wrap{padding:18px 14px}}
+</style>
 </head>
 <body>
-<div id="installAppBar"><div>📲 MateKKaland telepítése<small>Legyen saját ikonja a telefonodon!</small></div><button id="installAppBtn" type="button">Telepítés</button></div>
-
-<header><h1>🌈 MateKKaland</h1><p>Tanulj, játssz, fejlődj – minden csillag számít!</p><div class="fun-scene" aria-label="Vidám kalandfigurák"><span>🦋</span><span>🐸</span><span>🌟</span><span>🎈</span></div></header>
-<main>
-<section id="home">
- <div class="card hero">
-  <div class="mascot" id="homeMascot">🦊</div><h2 id="welcome">Szia, kis matematikus!</h2>
-  <p class="sub">Válaszd ki a kalandod, gyűjts csillagokat, és lépj egyre magasabb szintre!</p>
-  <label for="profileSelect">Gyermekprofil</label><select id="profileSelect" onchange="switchProfile(this.value)"></select><div class="two"><button class="secondary" onclick="addProfile()">➕ Új gyermek</button><button class="secondary" onclick="renameProfile()">✏️ Név módosítása</button></div><label for="player">A játékos neve</label><input id="player" maxlength="24" placeholder="Hogy hívnak?">
-  <label for="grade">Melyik osztályba jársz?</label><select id="grade"><option value="1">1. osztály</option><option value="2">2. osztály</option><option value="3">3. osztály</option><option value="4">4. osztály</option><option value="5">5. osztály</option><option value="6">6. osztály</option></select>
-  <label>Válassz társat!</label><div class="grid characters" id="characters"></div>
-  <label for="topic">Milyen feladatot szeretnél?</label><select id="topic"><option value="mixed">🎲 Vegyes gyakorlás</option><option value="plusminus">➕ Összeadás és kivonás</option><option value="multiply">✖️ Szorzás és osztás</option><option value="challenge">🏆 Napi kihívás</option><option value="mistakes">💡 Korábbi hibáim gyakorlása</option><option value="puzzle">🧩 Vidám logikai fejtörők</option></select>
-  <button onclick="startGame()">🚀 Induljon a kaland!</button>
- </div>
- <div class="card"><h2>🗺️ Kalandtérkép</h2><p class="sub">Minden gyakorlással újabb világok várnak!</p><div class="adventure"><div class="world"><span>🌳</span>Számerdő</div><div class="world"><span>🏰</span>Összeadás-vár</div><div class="world"><span>🚀</span>Szorzás-galaxis</div></div><p class="small" style="text-align:center">10 feladat = egy kalandkör • 50 csillag = új szint</p></div><div class="card"><h2>⭐ Az én gyűjteményem</h2><div class="stats"><div class="stat">Összes csillag<strong id="totalStars">0</strong></div><div class="stat">Megoldott feladat<strong id="totalDone">0</strong></div><div class="stat">Jelvények<strong id="badgeCount">0</strong></div></div><div class="stat" style="margin-top:9px">🔥 Napi kihívás-sorozat<strong id="dailyStreak">0 nap</strong></div><p class="small" id="dailyStatus" style="text-align:center;margin-bottom:0">A mai kihívás még vár rád!</p><div id="badges" class="pills" style="margin-top:12px"></div></div>
- <div class="card"><h2>👨‍👩‍👧 Szülői sarok</h2><p class="sub">Nézd meg a gyakorlásokat, a fejlődést és a még ismétlendő feladatokat.</p><button class="secondary" onclick="showParent()">📊 Eredmények és hibák megtekintése</button></div>
-</section>
-<section id="game" class="hidden">
- <div class="card">
-  <div class="stats"><div class="stat">⭐ Csillag<strong id="points">0</strong></div><div class="stat">🔥 Jó sorozat<strong id="streak">0</strong></div><div class="stat">📘 Feladat<strong id="count">1/10</strong></div></div>
-  <div class="progress"><span id="bar"></span></div>
-  <div class="hero"><div class="fun-scene"><span>🦋</span><span>⭐</span><span>🐝</span><span>🎈</span></div><div class="mascot" id="gameMascot">🦊</div><div class="pills"><span class="pill" id="playerPill">Játékos</span><span class="pill" id="gradePill">1. osztály</span><span class="pill" id="levelPill">1. szint</span></div></div>
-  <h2 id="topicTitle">Számoljunk!</h2><div class="question" id="question">2 + 3 = ?</div>
-  <input id="answer" class="answer" type="number" inputmode="decimal" placeholder="Írd ide a választ!" autocomplete="off">
-  <button id="checkBtn" onclick="checkAnswer()">Ellenőrzés ✓</button><div id="feedback" class="feedback" aria-live="polite"></div>
-  <div class="two"><button class="secondary" onclick="speakQuestion()">🔊 Hallgasd meg</button><button class="secondary" onclick="nextQuestion()">Következő ➜</button></div>
-  <button class="gold" onclick="finishGame()">🏁 Befejezem a kalandot</button>
- </div>
-</section>
-<section id="parent" class="hidden">
- <div class="card"><div class="mascot hero">👨‍👩‍👧</div><h2>Szülői eredmények 🔐</h2><p class="sub">A szülői felület PIN-kóddal védett ezen a készüléken.</p><button class="secondary" onclick="changeParentPin()">🔑 Szülői PIN módosítása</button><div class="stats"><div class="stat">Feladat<strong id="pDone">0</strong></div><div class="stat">Helyes<strong id="pCorrect">0</strong></div><div class="stat">Pontosság<strong id="pRate">0%</strong></div></div><div class="progress"><span id="pBar"></span></div><h3>Legutóbbi gyakorlások</h3><div id="sessions"></div><h3 style="margin-top:18px">Ismétlendő hibák</h3><div id="mistakeList"></div><button class="secondary" onclick="goHome()">⬅ Vissza a főoldalra</button><button class="danger" onclick="clearData()">Eredmények törlése</button></div>
-</section>
-<section id="summary" class="hidden"><div class="card hero"><div class="mascot">🏆</div><h2>Szép munka!</h2><p id="summaryText" class="sub"></p><div class="stats"><div class="stat">Megoldott<strong id="sDone">0</strong></div><div class="stat">Helyes<strong id="sCorrect">0</strong></div><div class="stat">Szerzett csillag<strong id="sStars">0</strong></div></div><div id="newBadges" class="pills" style="margin:15px 0"></div><button onclick="goHome()">🏠 Vissza a főoldalra</button><button class="secondary" onclick="retryMistakes()">💡 Hibás feladatok gyakorlása</button></div></section>
-</main><footer>MateKKaland • A tudás kaland, minden nap! 🌟</footer>
+<div id="ageGate"><div class="modal"><div class="logo">X<b>HUB</b></div><h2>Adults only · 18+</h2><p>This website is intended only for adults. By continuing, you confirm that you are at least 18 years old (or the age of majority where you live) and that accessing adult content is legal in your location.</p><div class="actions"><button id="enter">I am 18+ — Enter</button><button class="no" id="leave">I am under 18</button></div><p class="small">This age confirmation is a basic demo gate, not legally sufficient age verification.</p></div></div>
+<header><div class="bar"><a class="logo" href="#">X<b>HUB</b></a><nav><a href="#catalog">Explore</a><a href="#creators">Creators</a><a href="#promote">Promote</a><a href="#rules">Safety</a></nav><button onclick="document.querySelector('#promote').scrollIntoView({behavior:'smooth'})">Join XHUB</button></div></header>
+<main class="wrap">
+<section class="hero"><div><div class="eyebrow">A new 18+ community directory</div><h1>Your World.<br><span style="color:#ff7ca4">Your Content.</span></h1><p>Discover verified adult creators and legally licensed content in one organized, multilingual destination. Free-to-view community submissions are the planned foundation.</p><button onclick="document.querySelector('#catalog').scrollIntoView({behavior:'smooth'})">Explore the catalogue</button></div><div class="hero-art">XHUB</div></section>
+<div class="notice"><strong>Preview version:</strong> This is a visual prototype only. It does not host, stream, accept uploads, collect personal documents, run ads or process payments yet. Those functions require secure backend services, specialist hosting, moderation and legal review.</div>
+<div class="ad"><strong>Advertisement placement</strong>Reserved space for compliant adult-advertising partners. Ads will only be activated after network approval and consent/privacy setup.</div>
+<section id="catalog"><div class="section-head"><div><div class="eyebrow">Discover</div><h2>Explore the catalogue</h2></div><span class="muted">Free-to-view model</span></div><div class="filters"><button class="chip active" data-filter="all">All</button><button class="chip" data-filter="licensed">Licensed partners</button><button class="chip" data-filter="creator">Creator pages</button><button class="chip" data-filter="preview">Trailers & previews</button></div>
+<div class="grid" id="cards">
+<article class="tile" data-kind="licensed"><div class="thumb">▶</div><div class="tile-body"><span class="tag">Licensed partner</span><h3>Partner video directory</h3><p>Only approved embeds and links from partners with documented distribution rights.</p><span class="small">Catalogue preview · No video hosted here</span></div></article>
+<article class="tile" data-kind="creator"><div class="thumb">✦</div><div class="tile-body"><span class="tag">Creator pages</span><h3>Verified creator profiles</h3><p>Public profiles for verified adults, with consent-checked content and clear reporting tools.</p><span class="small">Catalogue preview · No user content yet</span></div></article>
+<article class="tile" data-kind="preview"><div class="thumb">◇</div><div class="tile-body"><span class="tag">Trailers & previews</span><h3>Official previews</h3><p>Preview listings supplied by rights holders or authorized distribution partners.</p><span class="small">Catalogue preview · No video hosted here</span></div></article>
+</div></section>
+<div class="ad"><strong>Advertisement placement</strong>Potential banner or native-ad slot. No forced pop-ups, deceptive clicks or repeated ad reloads.</div>
+<section class="cols" id="creators"><div class="box"><div class="eyebrow">For creators</div><h2>Share your own work</h2><p class="muted">The planned platform allows verified adult creators to submit their own lawful content for free public viewing. Uploaders are not paid for views.</p><ul><li>Identity and age checks for every uploader.</li><li>Proof of age and documented consent for every depicted person.</li><li>Rights ownership or written distribution permission.</li><li>Pre-publication moderation and takedown process.</li></ul></div><div class="box" id="promote"><div class="eyebrow">For businesses & creators</div><h2>Promote yourself</h2><p class="muted">Paid profile boosts and approved business listings may be offered after launch, subject to law and payment-provider approval.</p><form id="interest"><label>Your email (demo only)<input type="email" placeholder="you@example.com" required></label><label>I'm interested in<select><option>Creator profile</option><option>Business listing</option><option>Advertising</option><option>Licensed content partnership</option></select></label><button type="submit">Register interest (demo)</button><p class="small" id="formMsg">Demo form: nothing is sent or stored.</p></form></div></section>
+<section id="rules"><div class="section-head"><div><div class="eyebrow">Trust & safety</div><h2>Non-negotiable standards</h2></div></div><div class="box"><p class="muted">XHUB is planned for lawful adult content only. No minors, coercion, non-consensual intimate imagery, trafficking, hidden-camera material, impersonation or copyright infringement. Every participant must be an adult and must have given informed, documented consent. Reports must be reviewed promptly, with a clear removal and appeal process.</p><p class="small">Before public launch, the operator must implement robust age assurance, KYC/consent records, privacy-by-design, content moderation, copyright notices, data retention controls, local legal review and a payment provider that explicitly accepts the business category.</p></div></section>
+</main>
+<footer><div class="logo">X<b>HUB</b></div><p>Your World. Your Content.</p><p class="small">18+ only · Prototype · Legal and technical launch requirements remain outstanding.</p><p class="small"><a href="#rules">Safety</a> · <a href="#promote">Partnerships</a> · Privacy policy and terms must be completed before launch.</p></footer>
 <script>
-const characters=[{id:"fox",name:"Róka Robi",emoji:"🦊"},{id:"owl",name:"Bagoly Bori",emoji:"🦉"},{id:"cat",name:"Cica Cili",emoji:"🐱"},{id:"dino",name:"Dínó Dani",emoji:"🦖"}];
-const KEY="matekkaland_complete_v2",OLD="matekkaland_history",PIN_KEY="matekkaland_parent_pin",PROFILE_KEY="matekkaland_profiles_v1";
-let profiles=[],activeProfileId="";let data=loadData(),player="Játékos",grade=1,character=characters[0],topic="mixed",points=0,streak=0,done=0,correctCount=0,current=null,answered=false,sessionMistakes=[],sessionLog=[],questionSet=[],setIndex=0;
-function emptyData(){return{stars:0,done:0,correct:0,sessions:[],mistakes:[],badges:[],dailyChallengeDate:"",dailyStreak:0}}
-function loadData(){try{profiles=JSON.parse(localStorage.getItem(PROFILE_KEY)||"[]");if(!profiles.length){let old=JSON.parse(localStorage.getItem(KEY)||"null")||emptyData();profiles=[{id:"child1",name:"Játékos 1",grade:1,character:"fox",data:old}]}activeProfileId=localStorage.getItem("matekkaland_active_profile")||profiles[0].id;let p=profiles.find(x=>x.id===activeProfileId)||profiles[0];activeProfileId=p.id;return p.data||emptyData()}catch(e){profiles=[{id:"child1",name:"Játékos 1",grade:1,character:"fox",data:emptyData()}];activeProfileId="child1";return profiles[0].data}}
-function saveProfiles(){localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles));localStorage.setItem("matekkaland_active_profile",activeProfileId)}
-function saveData(){let p=profiles.find(x=>x.id===activeProfileId);if(p){p.data=data;p.grade=grade;p.character=character.id;saveProfiles()}localStorage.setItem(KEY,JSON.stringify(data))}
-function currentProfile(){return profiles.find(x=>x.id===activeProfileId)||profiles[0]}
-function renderProfiles(){let sel=document.getElementById("profileSelect");if(!sel)return;sel.innerHTML=profiles.map(p=>'<option value="'+escapeHTML(p.id)+'">'+escapeHTML(p.name)+'</option>').join("");sel.value=activeProfileId;let p=currentProfile();if(p){document.getElementById("player").value=p.name;document.getElementById("grade").value=String(p.grade||1);selectCharacter(p.character||"fox");document.getElementById("welcome").textContent="Szia, "+p.name+"!"}}
-function switchProfile(id){saveData();let p=profiles.find(x=>x.id===id);if(!p)return;activeProfileId=id;data=p.data||emptyData();grade=p.grade||1;character=characters.find(c=>c.id===p.character)||characters[0];saveProfiles();renderProfiles();refreshHome()}
-function addProfile(){if(profiles.length>=6){alert("Legfeljebb 6 gyermekprofil hozható létre.");return}let name=prompt("Mi legyen a gyermek neve?");if(!name||!name.trim())return;let p={id:"child"+Date.now(),name:name.trim().slice(0,24),grade:1,character:"fox",data:emptyData()};profiles.push(p);activeProfileId=p.id;data=p.data;grade=1;character=characters[0];saveProfiles();renderProfiles();refreshHome()}
-function renameProfile(){let p=currentProfile();if(!p)return;let name=prompt("Új név:",p.name);if(!name||!name.trim())return;p.name=name.trim().slice(0,24);saveProfiles();renderProfiles()}
-function show(id){["home","game","parent","summary"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById(id).classList.remove("hidden");window.scrollTo(0,0)}
-function init(){document.getElementById("characters").innerHTML=characters.map((c,i)=>'<div class="character '+(!i?'selected':'')+'" data-id="'+c.id+'" onclick="selectCharacter(\''+c.id+'\')"><span>'+c.emoji+'</span><b>'+c.name+'</b></div>').join("");refreshHome()}
-function selectCharacter(id){character=characters.find(c=>c.id===id)||characters[0];document.querySelectorAll(".character").forEach(el=>el.classList.toggle("selected",el.dataset.id===id));document.getElementById("homeMascot").textContent=character.emoji}
-function refreshHome(){data=loadData();document.getElementById("totalStars").textContent=data.stars;document.getElementById("totalDone").textContent=data.done;document.getElementById("badgeCount").textContent=data.badges.length;document.getElementById("badges").innerHTML=data.badges.length?data.badges.map(x=>'<span class="pill">'+escapeHTML(x)+'</span>').join(""):'<span class="small">Még várnak rád a jelvények!</span>';document.getElementById("dailyStreak").textContent=(data.dailyStreak||0)+" nap";let today=new Date().toLocaleDateString("sv-SE");document.getElementById("dailyStatus").textContent=data.dailyChallengeDate===today?"✅ A mai kihívást már teljesítetted!":"🎯 Teljesítsd a napi kihívást, és szerezz +20 bónuszcsillagot!"}
-function rand(n){return Math.floor(Math.random()*n)+1}
-function makeQuestion(){let a,b,op,ans,level=grade;
-let mode=topic==="challenge"?"mixed":topic;
-if(mode==="plusminus"){op=Math.random()<.5?"+":"-"}else if(mode==="multiply"){op=Math.random()<.5?"×":"÷"}else{let ops=grade<=2?["+","-"]:grade===3?["+","-","×","÷"]:["+","-","×","÷"];op=ops[rand(ops.length)-1]}
-if(grade===1){a=rand(10);b=rand(10);if(op==="×"||op==="÷")op=Math.random()<.5?"+":"-"}
-if(grade===2){a=rand(50);b=rand(50);if(op==="×"||op==="÷")op=Math.random()<.5?"+":"-"}
-if(grade===3){if(op==="×"||op==="÷"){a=rand(10);b=rand(10)}else{a=rand(100);b=rand(100)}}
-if(grade===4){if(op==="×"||op==="÷"){a=rand(12);b=rand(12)}else{a=rand(500);b=rand(500)}}
-if(grade===5){if(op==="×"||op==="÷"){a=rand(20);b=rand(12)}else{a=rand(1000);b=rand(1000)}}
-if(grade===6){if(op==="×"||op==="÷"){a=rand(25);b=rand(15)}else{a=rand(5000);b=rand(5000)}}
-if(op==="-"){if(b>a)[a,b]=[b,a];ans=a-b}
-if(op==="+")ans=a+b;
-if(op==="×")ans=a*b;
-if(op==="÷"){a=a*b;ans=b===0?0:a/b}
-return{text:a+" "+op+" "+b+" = ?",answer:ans,grade,op,a,b};
-}
-function buildQuestionSet(){questionSet=[];setIndex=0;let count=10;for(let i=0;i<count;i++){let q=makeQuestion();if(topic==="challenge"){q=makeQuestion();}questionSet.push(q)}}
-function startGame(){player=document.getElementById("player").value.trim()||"Játékos";grade=Number(document.getElementById("grade").value);topic=document.getElementById("topic").value;let prof=currentProfile();if(prof){prof.name=player;prof.grade=grade;prof.character=character.id;saveProfiles()}character=characters.find(c=>document.querySelector(".character.selected")?.dataset.id===c.id)||character;points=0;streak=0;done=0;correctCount=0;sessionMistakes=[];sessionLog=[];
-if(topic==="challenge"&&data.dailyChallengeDate===new Date().toLocaleDateString("sv-SE")){alert("A mai napi kihívást már teljesítetted! Holnap új kaland vár.");return}if(topic==="mistakes"){let pool=data.mistakes;if(!pool.length){alert("Még nincs korábbi hibás feladat. Játssz egy kört, és itt gyakorolhatod majd őket!");return}questionSet=pool.slice(-10).map(m=>({text:m.question,answer:m.answer,grade:m.grade||grade,op:"ismétlés"}));}else buildQuestionSet();
-document.getElementById("gameMascot").textContent=character.emoji;document.getElementById("playerPill").textContent=player;document.getElementById("gradePill").textContent=grade+". osztály";document.getElementById("topicTitle").textContent=topic==="challenge"?"🏆 Napi kihívás":topic==="mistakes"?"💡 Hibák gyakorlása":"Matematikai kaland";show("game");renderQuestion();if(window.MKSound)MKSound.start()}
-function renderQuestion(){current=questionSet[setIndex];if(!current){finishGame();return}answered=false;document.getElementById("question").textContent=current.text;document.getElementById("answer").value="";document.getElementById("feedback").textContent="";document.getElementById("feedback").className="feedback";document.getElementById("points").textContent=points;document.getElementById("streak").textContent=streak;document.getElementById("count").textContent=(setIndex+1)+"/"+questionSet.length;document.getElementById("levelPill").textContent=Math.floor((data.stars+points)/50)+1+". szint";document.getElementById("bar").style.width=(setIndex/questionSet.length*100)+"%";document.getElementById("answer").focus()}
-function checkAnswer(){if(answered)return;let raw=document.getElementById("answer").value;if(raw.trim()===""){document.getElementById("feedback").textContent="Írd be a választ!";return}let value=Number(raw);if(!Number.isFinite(value))return;answered=true;done++;data.done++;let ok=Math.abs(value-Number(current.answer))<0.000001;let msg;
-if(ok){correctCount++;data.correct++;points+=10;data.stars+=10;streak++;msg="🎉 Ügyes vagy! +10 csillag!";document.getElementById("feedback").classList.add("good");}
-else{streak=0;msg="💛 Semmi baj! A helyes válasz: "+current.answer;let m={question:current.text,answer:current.answer,grade:current.grade||grade,wrong:value,date:new Date().toLocaleDateString("hu-HU")};sessionMistakes.push(m);data.mistakes.push(m);data.mistakes=data.mistakes.slice(-100);document.getElementById("feedback").classList.add("bad")}
-sessionLog.push({question:current.text,given:value,correct:current.answer,ok});document.getElementById("feedback").textContent=msg;if(window.MKSound){if(ok)MKSound.success();else MKSound.error()}document.getElementById("points").textContent=points;document.getElementById("streak").textContent=streak;document.getElementById("bar").style.width=(done/questionSet.length*100)+"%";saveData();refreshHome()}
-function nextQuestion(){if(!answered){document.getElementById("feedback").textContent="Előbb ellenőrizd a válaszodat!";return}setIndex++;renderQuestion()}
-function speakQuestion(){const feedback=document.getElementById("feedback");if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window)){feedback.textContent="A telefon böngészője nem támogatja a felolvasást. Nyisd meg Chrome-ban!";feedback.className="feedback bad";return}if(!current){feedback.textContent="Előbb indíts el egy feladatot!";return}const synth=window.speechSynthesis;synth.cancel();synth.resume();const spoken=String(current.text).replace(/[🧩]/g,"").replace(/×/g," szor ").replace(/÷/g," osztva ").replace(/\+/g," plusz ").replace(/=/g," mennyi? ").replace(/-/g," mínusz ").replace(/\?/g,"").replace(/,/g,", ").trim();const u=new SpeechSynthesisUtterance(spoken);u.lang="hu-HU";u.rate=.82;u.pitch=1.05;u.volume=1;const voices=synth.getVoices();const hu=voices.find(v=>/^hu([-_]|$)/i.test(v.lang));if(hu)u.voice=hu;u.onstart=()=>{feedback.textContent="🔊 Figyelj, felolvasom a feladatot!";feedback.className="feedback"};u.onend=()=>{feedback.textContent="Kéred még egyszer? Nyomd meg a Hallgasd meg gombot!"};u.onerror=(e)=>{feedback.textContent="Nem indul a telefon beszédhangja ("+(e.error||"hiba")+"). Ellenőrizd a telefon Beszédszintézis / Google szövegfelolvasó beállítását.";feedback.className="feedback bad"};try{synth.speak(u);setTimeout(()=>{if(!synth.speaking&&!synth.pending&&feedback.textContent===""){feedback.textContent="A felolvasás nem indult el. Ellenőrizd a telefon szövegfelolvasó hangját.";feedback.className="feedback bad"}},900)}catch(e){feedback.textContent="A felolvasás nem indítható ezen a készüléken.";feedback.className="feedback bad"}}
-function awardBadges(){let earned=[];const rules=[["Első csillag",data.stars>=10],["Kis gyakorló",data.done>=10],["Húsz feladat hőse",data.done>=20],["Száz csillag klub",data.stars>=100],["Kitartó matematikus",data.correct>=25]];rules.forEach(([name,yes])=>{if(yes&&!data.badges.includes(name)){data.badges.push(name);earned.push(name)}});return earned}
-function finishGame(){if(done>0&&window.MKSound)MKSound.success();if(done===0){goHome();return}let accuracy=Math.round(correctCount/done*100);let dailyBonus=0;if(topic==="challenge"&&done===questionSet.length){let today=new Date().toLocaleDateString("sv-SE"),yesterday=new Date(Date.now()-86400000).toLocaleDateString("sv-SE");data.dailyStreak=data.dailyChallengeDate===yesterday?(data.dailyStreak||0)+1:1;data.dailyChallengeDate=today;if(accuracy>=80){dailyBonus=20;data.stars+=dailyBonus;if(!data.badges.includes("Napi bajnok"))data.badges.push("Napi bajnok")}}data.sessions.push({player,grade,points,done,correct:correctCount,accuracy,date:new Date().toLocaleString("hu-HU"),mistakes:sessionMistakes.slice()});data.sessions=data.sessions.slice(-50);let earned=awardBadges();saveData();document.getElementById("summaryText").textContent=player+", "+accuracy+"%-os eredményt értél el. "+(accuracy>=80?"Fantasztikus munka!":"Gyakorolj tovább, egyre ügyesebb leszel!");document.getElementById("sDone").textContent=done;document.getElementById("sCorrect").textContent=correctCount;document.getElementById("sStars").textContent=points+dailyBonus;document.getElementById("newBadges").innerHTML=(dailyBonus?'<span class="pill">🌟 +20 bónuszcsillag!</span>':"")+(earned.length?earned.map(x=>'<span class="pill">🏅 '+escapeHTML(x)+'</span>').join(""):'<span class="small">Még egy kis gyakorlás, és jön az új jelvény!</span>');show("summary");refreshHome()}
-function retryMistakes(){document.getElementById("topic").value="mistakes";goHome();startGame()}
-function goHome(){show("home");refreshHome()}
-function showParent(){let pin=localStorage.getItem(PIN_KEY);if(!pin){let first=prompt("Állíts be egy 4–8 számjegyű szülői PIN-kódot:");if(!first||!/^[0-9]{4,8}$/.test(first)){alert("A PIN 4–8 számjegy legyen.");return}let again=prompt("Írd be újra a PIN-kódot:");if(first!==again){alert("A két PIN nem egyezik.");return}localStorage.setItem(PIN_KEY,first);pin=first}if(prompt("Szülői PIN-kód:")!==pin){alert("Hibás PIN-kód.");return}data=loadData();let total=data.done,correct=data.correct,rate=total?Math.round(correct/total*100):0;document.getElementById("pDone").textContent=total;document.getElementById("pCorrect").textContent=correct;document.getElementById("pRate").textContent=rate+"%";document.getElementById("pBar").style.width=rate+"%";document.getElementById("sessions").innerHTML=data.sessions.length?data.sessions.slice().reverse().map(s=>'<div class="row"><b>'+escapeHTML(s.player)+'</b> • '+s.grade+'. osztály<br>⭐ '+s.points+' csillag • '+s.correct+'/'+s.done+' helyes ('+s.accuracy+'%)<br><span class="small">'+escapeHTML(s.date)+'</span></div>').join(""):'<p class="small">Még nincs befejezett gyakorlás.</p>';document.getElementById("mistakeList").innerHTML=data.mistakes.length?data.mistakes.slice().reverse().map(m=>'<div class="row">'+escapeHTML(m.question)+'<br>Helyes válasz: <b>'+escapeHTML(m.answer)+'</b> <span class="small">('+escapeHTML(m.date||"") +')</span></div>').join(""):'<p class="small">Nincs ismétlendő hiba. Csak így tovább!</p>';show("parent")}
-function changeParentPin(){let old=localStorage.getItem(PIN_KEY);if(old&&prompt("Jelenlegi PIN-kód:")!==old){alert("Hibás PIN-kód.");return}let next=prompt("Új PIN (4–8 számjegy):");if(!next||!/^[0-9]{4,8}$/.test(next)){alert("A PIN 4–8 számjegy lehet.");return}if(prompt("Új PIN még egyszer:")!==next){alert("A két PIN nem egyezik.");return}localStorage.setItem(PIN_KEY,next);alert("A PIN frissült ezen a készüléken.")}
-function clearData(){if(confirm("Biztosan törlöd az összes helyi eredményt, csillagot és hibát?")){data={stars:0,done:0,correct:0,sessions:[],mistakes:[],badges:[]};saveData();showParent();refreshHome()}}
-function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-document.getElementById("answer").addEventListener("keydown",e=>{if(e.key==="Enter"){if(!answered)checkAnswer();else nextQuestion()}});
-document.getElementById("player").addEventListener("input",e=>{document.getElementById("welcome").textContent=e.target.value.trim()?"Szia, "+e.target.value.trim()+"!":"Szia, kis matematikus!"});
-init();renderProfiles();
-</script>
-<script>
-// MateKKaland Android PWA és offline támogatás
-let matekInstallPrompt=null;
-const matekInstallBtn=document.getElementById("installAppBtn");
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();matekInstallPrompt=e;matekInstallBtn.textContent="Telepítés";});
-window.addEventListener("appinstalled",()=>{matekInstallPrompt=null;document.getElementById("installAppBar").innerHTML="<div>🎉 MateKKaland telepítve!<small>Most már a telefonodról is elindíthatod.</small></div>";});
-matekInstallBtn.addEventListener("click",async()=>{if(matekInstallPrompt){matekInstallPrompt.prompt();await matekInstallPrompt.userChoice;matekInstallPrompt=null;}else{alert("A telepítéshez nyisd meg a böngésző jobb felső menüjét (⋮), majd válaszd az „Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz” lehetőséget. Ha nem jelenik meg, előbb töltsd be az oldalt internetkapcsolattal, majd próbáld újra.");}});
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(err=>console.log("Offline mód nem aktiválódott:",err)));}
-</script>
-
-
-
-<script>
-/* Stabil, telefonbarát hangmotor: első érintéskor feloldja a böngésző hangját */
-(function(){
- let enabled=true,ctx=null,master=null,unlocked=false;
- function unlock(){
-  try{
-   const AC=window.AudioContext||window.webkitAudioContext;
-   if(!AC)return false;
-   if(!ctx){ctx=new AC();master=ctx.createGain();master.gain.value=.55;master.connect(ctx.destination);}
-   if(ctx.state==="suspended")ctx.resume();
-   unlocked=true;return true;
-  }catch(e){return false}
- }
- function beep(freq=600,duration=.16,wave="sine",volume=.22,delay=0){
-  if(!enabled)return;
-  if(!unlock())return;
-  try{
-   const now=ctx.currentTime+delay,osc=ctx.createOscillator(),gain=ctx.createGain();
-   osc.type=wave;osc.frequency.setValueAtTime(freq,now);
-   gain.gain.setValueAtTime(.001,now);gain.gain.linearRampToValueAtTime(volume,now+.018);
-   gain.gain.exponentialRampToValueAtTime(.001,now+duration);
-   osc.connect(gain);gain.connect(master);osc.start(now);osc.stop(now+duration+.03);
-  }catch(e){}
- }
- function success(){beep(523,.18,"sine",.24);beep(659,.18,"sine",.24,.16);beep(784,.3,"sine",.27,.32)}
- function error(){beep(260,.22,"triangle",.2);beep(190,.25,"triangle",.16,.18)}
- function start(){beep(660,.12);beep(880,.18,"sine",.2,.12)}
- function test(){unlock();success();if(!unlocked&&"speechSynthesis"in window){const u=new SpeechSynthesisUtterance("Szuper! A hang működik!");u.lang="hu-HU";speechSynthesis.speak(u)}}
- document.addEventListener("pointerdown",unlock,{once:true,passive:true});
- document.addEventListener("touchstart",unlock,{once:true,passive:true});
- const b=document.createElement("button");b.id="soundToggle";b.type="button";b.textContent="🔊 Hangok: BE";
- const hint=document.createElement("div");hint.id="soundHint";hint.textContent="Érintsd meg a hangpróbát, és engedélyezd a telefon hangját.";
- const testBtn=document.createElement("button");testBtn.type="button";testBtn.textContent="🎵 Hangpróba";testBtn.style.cssText="width:auto;margin:8px auto 0;padding:8px 14px;background:linear-gradient(#fff,#eee7ff);color:#5638ad;border:0;border-bottom:4px solid #d4c6f1";
- const box=document.createElement("div");box.style.cssText="text-align:center;position:relative;z-index:2";box.append(b,testBtn,hint);document.querySelector("header").appendChild(box);
- b.addEventListener("click",()=>{enabled=!enabled;b.textContent=enabled?"🔊 Hangok: BE":"🔇 Hangok: KI";if(enabled){unlock();start()}hint.textContent=enabled?"A hangok be vannak kapcsolva.":"A hangok ki vannak kapcsolva."});
- testBtn.addEventListener("click",()=>{enabled=true;b.textContent="🔊 Hangok: BE";unlock();test();hint.textContent="🎶 Hangpróba elindítva!"});
- 
- const originalMakeQuestion=makeQuestion;
- makeQuestion=function(){
-  if(topic==="puzzle"){
-   const kind=Math.floor(Math.random()*4),n=Math.floor(Math.random()*8)+2;
-   if(kind===0)return{text:"🧩 Mi következik? "+n+", "+(n+2)+", "+(n+4)+", ?",answer:n+6,grade:grade,op:"fejtörő"};
-   if(kind===1)return{text:"🧩 Mi következik? "+(n*2)+", "+(n*4)+", "+(n*6)+", ?",answer:n*8,grade:grade,op:"fejtörő"};
-   if(kind===2)return{text:"🧩 Hány lába van 2 cicának?",answer:8,grade:grade,op:"fejtörő"};
-   return{text:"🧩 5 madár ül az ágon. 2 elrepül. Hány marad?",answer:3,grade:grade,op:"fejtörő"};
-  }
-  return originalMakeQuestion();
- };
- window.MKSound={success,error,start,test,isEnabled:()=>enabled};
-})();
+const gate=document.getElementById('ageGate');if(sessionStorage.getItem('xhub-adult-confirmed')==='yes')gate.hidden=true;
+document.getElementById('enter').addEventListener('click',()=>{sessionStorage.setItem('xhub-adult-confirmed','yes');gate.hidden=true});
+document.getElementById('leave').addEventListener('click',()=>{location.replace('https://www.google.com/')});
+document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('#cards [data-kind]').forEach(c=>c.hidden=b.dataset.filter!=='all'&&c.dataset.kind!==b.dataset.filter)}));
+document.getElementById('interest').addEventListener('submit',e=>{e.preventDefault();document.getElementById('formMsg').textContent='Demo only: no data was sent. A secure registration service is not connected yet.'});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body></html>
