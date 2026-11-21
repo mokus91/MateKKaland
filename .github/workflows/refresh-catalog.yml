@@ -1,0 +1,44 @@
+name: Refresh XHUB video catalogue
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: xhub-catalog-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download latest approved playable listings
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            "https://adultembed.com/api/database/browse/?orientation=all&sort=newest&page=1&page_size=48" \
+            -H "X-Site-URL: https://mokus91.github.io/MateKKaland/" \
+            -H "Accept: application/json" \
+            -o /tmp/catalog-source.json
+          jq -e '.results | type == "array"' /tmp/catalog-source.json >/dev/null
+          jq '. + {generated_at: (now | todate)}' /tmp/catalog-source.json > catalog.json
+
+      - name: Commit refreshed catalogue when changed
+        run: |
+          if ! git diff --quiet -- catalog.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add catalog.json
+            git commit -m "Refresh XHUB video catalogue"
+            git push
+          else
+            echo "Catalogue unchanged; no commit needed."
+          fi
