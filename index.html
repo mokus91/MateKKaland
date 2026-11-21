@@ -39,7 +39,7 @@ footer{border-top:1px solid var(--line);text-align:center;padding:28px 15px;colo
 <div class="toolbar"><button class="pill" id="popularBtn">Popular</button><button class="pill active" id="newBtn">Latest</button><button class="pill" id="savedBtn">♡ Saved</button><span class="spacer"></span><span class="count">External catalogue</span></div>
 <div id="apiStatus" class="muted" role="status">Catalogue loads after age confirmation.</div><div class="grid" id="cards"></div>
 <div style="display:flex;justify-content:center;margin:20px"><button id="moreBtn" hidden>Load more</button></div>
-<div id="playerBox" class="box" hidden><div class="player-head"><h2 id="playerTitle">Video player</h2><button class="ghost" id="closePlayer">Close ✕</button></div><div class="player-frame"><iframe id="filmPlayer" title="External video player" src="about:blank" width="640" height="360" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe></div><p class="small">The video is played by the external provider. XHUB does not store the video file. <a id="openExternalPlayer" href="https://adultembed.com/" target="_blank" rel="noopener" style="color:#ff8db3;text-decoration:underline">Open player directly ↗</a></p></div>
+<div id="playerBox" class="box" hidden><div class="player-head"><h2 id="playerTitle">Video player</h2><button class="ghost" id="closePlayer">Close ✕</button></div><div id="playerLoading" class="muted" role="status" style="padding:10px 0">Preparing video player…</div><div class="player-frame"><iframe id="filmPlayer" title="External video player" src="about:blank" width="640" height="360" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe></div><p id="playerMessage" class="small" role="status">The video is streamed by the external provider. XHUB does not host the video file.</p><p class="small"><a id="openExternalPlayer" href="https://adultembed.com/" target="_blank" rel="noopener" style="color:#ff8db3;text-decoration:underline">Open player in a new tab ↗</a></p></div>
 </section>
 <div class="ad"><b>Partner placement</b>Space for approved partner promotions after launch.</div>
 <section class="cols" id="creators" style="margin-top:28px"><div class="box"><div class="eyebrow">Creator community</div><h2>Creator profiles</h2><p>Planned public profiles for verified adult creators, with clear consent checks, reporting tools and profile controls.</p><ul><li>Identity and age checks for every creator.</li><li>Proof of age and documented consent for every depicted person.</li><li>Rights ownership or written distribution permission.</li><li>Review and takedown process.</li></ul><span class="small">Creator registration is not active in this preview.</span></div><div class="box" id="partners"><div class="eyebrow">For businesses & creators</div><h2>Promote your profile</h2><p>Approved business listings and paid profile boosts may be considered after launch, subject to law and payment-provider approval.</p><p class="small">Partnership enquiries are not submitted or stored by this demo page.</p><button class="ghost" disabled>Partner registration — coming soon</button></div></section>
@@ -66,13 +66,20 @@ async function loadFilms(append=false){if(busy)return;busy=true;status.textConte
 function setSort(next){sort=next;savedOnly=false;page=1;document.getElementById('popularBtn').classList.toggle('active',sort==='popular');document.getElementById('newBtn').classList.toggle('active',sort==='newest');document.getElementById('savedBtn').classList.remove('active');document.getElementById('catalogTitle').textContent=sort==='popular'?'Popular videos':'Latest videos';loadFilms();}
 async function requestPlayerUrl(id){
  const endpoint='https://adultembed.com/api/videos/'+encodeURIComponent(id)+'/get-embed/';
- const response=await fetch(endpoint,{method:'POST',headers:{'X-Site-URL':SITE_URL,'Accept':'application/json'}});
- if(!response.ok)throw new Error('Player API HTTP '+response.status);
- const data=await response.json();
- let url=data.player_url||data.url||data.embed_url||'';
- if(!url&&data.embed_code){const doc=new DOMParser().parseFromString(data.embed_code,'text/html');url=doc.querySelector('iframe')?.src||'';}
- if(!url)throw new Error('A szolgáltató nem adott lejátszócímet ehhez a videóhoz.');
- return url;
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),12000);
+ try{
+  const response=await fetch(endpoint,{method:'POST',headers:{'X-Site-URL':SITE_URL,'Accept':'application/json'},signal:controller.signal});
+  if(!response.ok)throw new Error('Signed player request failed (HTTP '+response.status+')');
+  const data=await response.json();
+  if(typeof data.player_url==='string'&&data.player_url.startsWith('https://adultembed.com/player/'))return data.player_url;
+  throw new Error('The provider returned no valid player URL.');
+ }finally{clearTimeout(timer);}
+}
+function showPlayerMessage(message,isError=false){
+ const el=document.getElementById('playerMessage');
+ el.textContent=message;
+ el.style.color=isError?'#ff9ab8':'';
 }
 cards.addEventListener('click',async e=>{
  const save=e.target.closest('[data-save]');
@@ -82,22 +89,26 @@ cards.addEventListener('click',async e=>{
  const id=b.dataset.video,title=b.closest('.tile').querySelector('h3').textContent;
  const frame=document.getElementById('filmPlayer'),box=document.getElementById('playerBox');
  const direct=document.getElementById('openExternalPlayer');
+ const loading=document.getElementById('playerLoading');
  document.getElementById('playerTitle').textContent=title;
- status.textContent='Secure player link requested…';
  box.hidden=false;frame.src='about:blank';direct.href='https://adultembed.com/';
+ loading.hidden=false;loading.textContent='Preparing secure video player…';
+ showPlayerMessage('Connecting to the video provider…');
  box.scrollIntoView({behavior:'smooth',block:'start'});
  b.disabled=true;
  try{
   const playerUrl=await requestPlayerUrl(id);
   direct.href=playerUrl;
   frame.src=playerUrl;
-  status.textContent='Player loaded. If it still does not play, the source provider may be unavailable.';
+  loading.textContent='Player requested. The video should appear below.';
+  showPlayerMessage('If playback does not start, the selected video or its provider may be unavailable.');
  }catch(err){
-  status.textContent='Player error: '+(err?.message||'unknown error');
-  console.error(err);
+  loading.textContent='Could not prepare this player.';
+  showPlayerMessage((err?.name==='AbortError'?'The player request timed out. ':'')+(err?.message||'Unknown player error'),true);
+  console.error('XHUB player error',err);
  }finally{b.disabled=false;}
 });
-document.getElementById('closePlayer').addEventListener('click',()=>{document.getElementById('filmPlayer').src='about:blank';document.getElementById('playerBox').hidden=true;});
+document.getElementById('closePlayer').addEventListener('click',()=>{document.getElementById('filmPlayer').src='about:blank';document.getElementById('playerBox').hidden=true;document.getElementById('playerLoading').hidden=false;});
 document.getElementById('moreBtn').addEventListener('click',()=>loadFilms(true));
 document.getElementById('popularBtn').addEventListener('click',()=>setSort('popular'));
 document.getElementById('newBtn').addEventListener('click',()=>setSort('newest'));
