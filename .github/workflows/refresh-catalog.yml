@@ -33,10 +33,10 @@ jobs:
 
       - name: Commit refreshed catalogue when changed
         run: |
-          if ! git diff --quiet -- catalog.json; then
+          git add catalog.json
+          if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add catalog.json
             git commit -m "Refresh XHUB video catalogue"
             git push
           else
