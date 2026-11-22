@@ -31,7 +31,17 @@ const games=[
 {id:"csillag",name:"Csillaggyűjtő",category:"Kaland",icon:"⭐",description:"Gyűjts 30 csillagot 60 másodperc alatt!",status:"Játszható",playUrl:"./games/csillaggyujto.html",downloadUrl:"./games/csillaggyujto.html"},
 {id:"snake",name:"Snake – Kígyó",category:"Ügyességi",icon:"🐍",description:"Klasszikus kígyós játék, három sebességgel és mentett rekorddal.",status:"Játszható",playUrl:"./games/snake.html",downloadUrl:"./games/snake.html"},
 {id:"tank",name:"Tank aréna",category:"Akció",icon:"🛡️",description:"Irányítsd a tankot, lődd ki a célpontokat, és teljesíts öt hullámot!",status:"Játszható",playUrl:"./games/tank-arena.html",downloadUrl:"./games/tank-arena.html"},
-{id:"brick",name:"Téglatörő",category:"Ügyességi",icon:"🧱",description:"Pattogó labda, öt pálya és három élet – döntsd le az összes téglát!",status:"Játszható",playUrl:"./games/teglatoro.html",downloadUrl:"./games/teglatoro.html"}
+{id:"brick",name:"Téglatörő",category:"Ügyességi",icon:"🧱",description:"Pattogó labda, öt pálya és három élet – döntsd le az összes téglát!",status:"Játszható",playUrl:"./games/teglatoro.html",downloadUrl:"./games/teglatoro.html"},
+{id:"autoverseny",name:"Mini autóverseny",category:"Verseny",icon:"🏎️",description:"Kerüld ki a forgalmat, gyűjts pontokat és maradj a pályán!",status:"Játszható",playUrl:"./games/autoverseny.html",downloadUrl:"./games/autoverseny.html"},
+{id:"urhajo",name:"Űrhajós védelem",category:"Akció",icon:"🚀",description:"Lődd le a közeledő meteorokat, és védd meg az űrhajót!",status:"Játszható",playUrl:"./games/urhajo.html",downloadUrl:"./games/urhajo.html"},
+{id:"ugralos-kaland",name:"Ugrálós kaland",category:"Kaland",icon:"🦘",description:"Ugorj át az akadályokon, és gyűjts csillagokat!",status:"Játszható",playUrl:"./games/ugralos-kaland.html",downloadUrl:"./games/ugralos-kaland.html"},
+{id:"pingpong",name:"Pingpong párbaj",category:"Ügyességi",icon:"🏓",description:"Tartsd játékban a labdát, és üsd vissza!",status:"Játszható",playUrl:"./games/pingpong.html",downloadUrl:"./games/pingpong.html"},
+{id:"labirintus",name:"Varázs labirintus",category:"Logikai",icon:"🌀",description:"Találd meg a kijáratot a kanyargós útvesztőből!",status:"Játszható",playUrl:"./games/labirintus.html",downloadUrl:"./games/labirintus.html"},
+{id:"celbadobo",name:"Célbadobó",category:"Ügyességi",icon:"🎯",description:"Találd el a mozgó célpontot minél többször!",status:"Játszható",playUrl:"./games/celbadobo.html",downloadUrl:"./games/celbadobo.html"},
+{id:"buborekvaro",name:"Buborékvár",category:"Ügyességi",icon:"🫧",description:"Pukkaszd ki a felbukkanó buborékokat!",status:"Játszható",playUrl:"./games/buborekvaro.html",downloadUrl:"./games/buborekvaro.html"},
+{id:"szamparok",name:"Számpárok",category:"Oktató",icon:"🔢",description:"Párosítsd össze az azonos számokat!",status:"Játszható",playUrl:"./games/szamparok.html",downloadUrl:"./games/szamparok.html"},
+{id:"kosardobas",name:"Kosárra dobás",category:"Sport",icon:"🏀",description:"Időzítsd a dobást, és juttasd a labdát a kosárba!",status:"Játszható",playUrl:"./games/kosardobas.html",downloadUrl:"./games/kosardobas.html"},
+{id:"meteorvedo",name:"Meteor kerülő",category:"Kaland",icon:"☄️",description:"Mozgasd az űrhajót, és kerüld ki a meteorokat!",status:"Játszható",playUrl:"./games/meteorvedo.html",downloadUrl:"./games/meteorvedo.html"}
 ];
 const categories=["Mindegyik",...new Set(games.map(g=>g.category))];let selected="Mindegyik",query="";
 const grid=document.getElementById("gameGrid"),chips=document.getElementById("chips");
