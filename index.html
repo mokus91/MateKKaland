@@ -25,10 +25,13 @@
 <footer><div class="brand">mini<span>games</span></div><p>Játssz, fedezz fel, tölts le!</p><p>© <span id="year"></span> MiniGames · Saját fejlesztésű játékgyűjtemény</p></footer>
 <script>
 const games=[
-{id:"memoria",name:"Memória kártyák",category:"Logikai",icon:"🧠",description:"Találd meg a 6 állatpárt! Figyeld meg jól a kártyákat.",status:"Játszható",playUrl:"./games/memoria.html",downloadUrl:"./games/memoria.html"},
-{id:"matek",name:"Vidám matek",category:"Oktató",icon:"➕",description:"10 könnyű összeadás és kivonás vidám feladatokkal.",status:"Játszható",playUrl:"./games/gyors-matek.html",downloadUrl:"./games/gyors-matek.html"},
-{id:"szin",name:"Színkereső",category:"Ügyességi",icon:"🎨",description:"Találd meg a megfelelő színt 30 másodperc alatt!",status:"Játszható",playUrl:"./games/szinkereső.html",downloadUrl:"./games/szinkereső.html"},
-{id:"csillag",name:"Csillaggyűjtő",category:"Kaland",icon:"⭐",description:"Kapd el a csillagot, és gyűjts össze 10 pontot!",status:"Játszható",playUrl:"./games/csillaggyujto.html",downloadUrl:"./games/csillaggyujto.html"}
+{id:"memoria",name:"Memória kártyák",category:"Logikai",icon:"🧠",description:"Állatpárok keresése 6, 10 vagy 16 párral.",status:"Játszható",playUrl:"./games/memoria.html",downloadUrl:"./games/memoria.html"},
+{id:"matek",name:"Vidám matek",category:"Oktató",icon:"➕",description:"30 feladat három nehézségi szinten, összeadás, kivonás és szorzás.",status:"Játszható",playUrl:"./games/gyors-matek.html",downloadUrl:"./games/gyors-matek.html"},
+{id:"szin",name:"Színkereső",category:"Ügyességi",icon:"🎨",description:"Színfelismerő játék több körrel és gyakorló móddal.",status:"Játszható",playUrl:"./games/szinkereső.html",downloadUrl:"./games/szinkereső.html"},
+{id:"csillag",name:"Csillaggyűjtő",category:"Kaland",icon:"⭐",description:"Gyűjts 30 csillagot 60 másodperc alatt!",status:"Játszható",playUrl:"./games/csillaggyujto.html",downloadUrl:"./games/csillaggyujto.html"},
+{id:"snake",name:"Snake – Kígyó",category:"Ügyességi",icon:"🐍",description:"Klasszikus kígyós játék, három sebességgel és mentett rekorddal.",status:"Játszható",playUrl:"./games/snake.html",downloadUrl:"./games/snake.html"},
+{id:"tank",name:"Tank aréna",category:"Akció",icon:"🛡️",description:"Irányítsd a tankot, lődd ki a célpontokat, és teljesíts öt hullámot!",status:"Játszható",playUrl:"./games/tank-arena.html",downloadUrl:"./games/tank-arena.html"},
+{id:"brick",name:"Téglatörő",category:"Ügyességi",icon:"🧱",description:"Pattogó labda, öt pálya és három élet – döntsd le az összes téglát!",status:"Játszható",playUrl:"./games/teglatoro.html",downloadUrl:"./games/teglatoro.html"}
 ];
 const categories=["Mindegyik",...new Set(games.map(g=>g.category))];let selected="Mindegyik",query="";
 const grid=document.getElementById("gameGrid"),chips=document.getElementById("chips");
