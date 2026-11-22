@@ -1,14 +1,14 @@
 {
-  "name": "XHUB",
-  "short_name": "XHUB",
-  "description": "A planned international directory for verified adult creators and licensed 18+ content.",
-  "lang": "en",
+  "name": "MiniGames – Mini játékok",
+  "short_name": "MiniGames",
+  "description": "Saját fejlesztésű mini játékok gyűjteménye és letöltőoldala.",
+  "lang": "hu",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0c0c12",
-  "theme_color": "#101018",
+  "background_color": "#0b1020",
+  "theme_color": "#111827",
   "icons": [
     {
       "src": "./icon.svg",
